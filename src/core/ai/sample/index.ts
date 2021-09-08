@@ -17,10 +17,6 @@ class Sample {
 		return this.answer;
 	}
 
-	public toString(): string {
-		return `pattern: [${this.pattern.join(';')}], answer: ${this.answer}`;
-	}
-
 	public static normalizeOne(sample: Sample): Sample {
 		const pattern = sample.getPattern();
 		const patternNormalized = [];

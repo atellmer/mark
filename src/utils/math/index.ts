@@ -20,4 +20,12 @@ function random(min?: number, max?: number): number {
 	return math.random(min, max);
 }
 
-export { mean, pow, sqrt, exp, random };
+function abs(x: number): number {
+	return math.abs(x);
+}
+
+function log(x: number): number {
+	return math.log(x);
+}
+
+export { mean, pow, sqrt, exp, random, abs, log };
