@@ -28,4 +28,12 @@ function log(x: number): number {
 	return math.log(x);
 }
 
-export { mean, pow, sqrt, exp, random, abs, log };
+function min(values: Array<number>): number {
+	return math.min(values);
+}
+
+function max(values: Array<number>): number {
+	return math.max(values);
+}
+
+export { mean, pow, sqrt, exp, random, abs, log, min, max };

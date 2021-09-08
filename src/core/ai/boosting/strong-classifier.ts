@@ -2,6 +2,7 @@ import { log, exp } from '@utils/math';
 import { Sample } from '../sample';
 import { Answer } from './models';
 import { WeakClassifier } from './weak-classifier';
+import { ProbabilitySelector } from './probability-selector';
 
 class StrongClassifier {
 	private weakClassifier: WeakClassifier;
@@ -23,11 +24,10 @@ class StrongClassifier {
 		this.alfa = alfa;
 	}
 
-	public static train(samples: Array<Sample>, classifiersCount: number): Array<StrongClassifier> {
+	public static train(samples: Array<Sample>, iterationCount: number): Array<StrongClassifier> {
 		const size = samples.length;
 		const weights: Array<number> = [];
 		const predictions: Array<Answer> = [];
-		const random = 0;
 		const classifiers: Array<StrongClassifier> = [];
 		let selectedSamples = [...samples];
 		let weightsSum = 0;
@@ -38,7 +38,7 @@ class StrongClassifier {
 			weights[i] = 1 / size;
 		}
 
-		for (let k = 0; k < classifiersCount; k++) {
+		for (let k = 0; k < iterationCount; k++) {
 			const weakClassifier = WeakClassifier.train(selectedSamples);
 			const strongClassifier = new StrongClassifier();
 			epsilon = 0;
@@ -79,7 +79,7 @@ class StrongClassifier {
 				weights[i] = (weights[i] * exp(-1 * alfa * samples[i].getAnswer() * predictions[i])) / weightsSum;
 			}
 
-			selectedSamples = ProbabilisticSelector.Select(random, weights, selectedSamples);
+			selectedSamples = ProbabilitySelector.select(weights, selectedSamples);
 		}
 
 		return classifiers;
