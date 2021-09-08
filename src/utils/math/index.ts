@@ -16,4 +16,8 @@ function exp(x: number): number {
 	return math.exp(x);
 }
 
-export { mean, pow, sqrt, exp };
+function random(min?: number, max?: number): number {
+	return math.random(min, max);
+}
+
+export { mean, pow, sqrt, exp, random };

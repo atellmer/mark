@@ -7,13 +7,13 @@ class Bot implements MarketSubscriber {
 	symbol: string;
 	ansible: StrategyAnsible;
 	trader: Trader;
-	mm: MoneyManagement;
+	moneyManagement: MoneyManagement;
 
-	constructor(symbol: string, ansible: StrategyAnsible, trader: Trader, mm: MoneyManagement) {
+	constructor(symbol: string, ansible: StrategyAnsible, trader: Trader, moneyManagement: MoneyManagement) {
 		this.symbol = symbol;
 		this.ansible = ansible;
 		this.trader = trader;
-		this.mm = mm;
+		this.moneyManagement = moneyManagement;
 	}
 
 	async notify(price: Price) {
@@ -21,7 +21,7 @@ class Bot implements MarketSubscriber {
 		const hasDeal = [TradingDecision.BUY, TradingDecision.SELL].includes(decision);
 
 		if (hasDeal) {
-			const { amount, stopLoss, takeProfit } = await this.mm.getOrderParameters(price);
+			const { amount, stopLoss, takeProfit } = await this.moneyManagement.getOrderParameters(price, decision);
 			const options: MakeOrderOptions = {
 				symbol: this.symbol,
 				type: OrderType.MARKET,
