@@ -8,14 +8,9 @@ const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { GenerateSW } = require('workbox-webpack-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const alias = require('./webpack.alias');
-const { createHtmlPluginOptions, domainsMap } = require('./webpack.shared');
-const gitRevisionPlugin = new GitRevisionPlugin({
-	commithashCommand: 'rev-parse --short HEAD',
-});
+const { createHtmlPluginOptions } = require('./webpack.shared');
 
 const createConfig = function (env) {
 	const config = {
@@ -52,7 +47,7 @@ const createConfig = function (env) {
 				new CssMinimizerPlugin(),
 			],
 		},
-		entry: resolve('src/index'),
+		entry: resolve('src/ui/index'),
 		output: {
 			path: resolve('public'),
 			filename: `[name].[hash].bundle.js`,
@@ -97,14 +92,8 @@ const createConfig = function (env) {
 			],
 		},
 		plugins: [
-			gitRevisionPlugin,
 			new webpack.DefinePlugin({
 				'process.browser': JSON.stringify(true),
-				'process.env': {
-					NODE_ENV: JSON.stringify('production'),
-					GIT_BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
-					GIT_COMMITHASH: JSON.stringify(gitRevisionPlugin.commithash()),
-				},
 			}),
 			new CleanWebpackPlugin({
 				verbose: true,
@@ -143,23 +132,6 @@ const createConfig = function (env) {
 			}),
 		],
 	};
-
-	if (env.production) {
-		config.plugins.push(
-			new GenerateSW({
-				swDest: './sw.js',
-				clientsClaim: true,
-				skipWaiting: true,
-				maximumFileSizeToCacheInBytes: 6000 * 1024 * 1024,
-				runtimeCaching: [
-					{
-						urlPattern: new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
-						handler: 'CacheFirst',
-					},
-				],
-			}),
-		);
-	}
 
 	return config;
 };

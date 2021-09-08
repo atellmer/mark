@@ -4,14 +4,9 @@ const { resolve, join } = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const alias = require('./webpack.alias');
 const { createHtmlPluginOptions } = require('./webpack.shared');
-
-const gitRevisionPlugin = new GitRevisionPlugin({
-	commithashCommand: 'rev-parse --short HEAD',
-});
 
 const createConfig = function (env) {
 	const config = {
@@ -26,7 +21,7 @@ const createConfig = function (env) {
 			},
 		},
 		devtool: 'eval-source-map',
-		entry: resolve('src/index'),
+		entry: resolve('src/ui/index'),
 		output: {
 			path: resolve('public'),
 			publicPath: '/',
@@ -38,27 +33,7 @@ const createConfig = function (env) {
 			port: 9001,
 			historyApiFallback: true,
 			proxy: {
-				'/atr-framework-services': {
-					target: `https://localhost/`,
-					secure: false,
-					changeOrigin: true,
-				},
-				'/atr-document-services': {
-					target: `https://localhost/`,
-					secure: false,
-					changeOrigin: true,
-				},
-				'/tenant-public-resources': {
-					target: `https://localhost/`,
-					secure: false,
-					changeOrigin: true,
-				},
-				'/bfm': {
-					target: `https://localhost/`,
-					secure: false,
-					changeOrigin: true,
-				},
-				'/auth': {
+				'/api': {
 					target: `https://localhost/`,
 					secure: false,
 					changeOrigin: true,
@@ -111,14 +86,8 @@ const createConfig = function (env) {
 			],
 		},
 		plugins: [
-			gitRevisionPlugin,
 			new webpack.DefinePlugin({
 				'process.browser': JSON.stringify(true),
-				'process.env': {
-					NODE_ENV: JSON.stringify('development'),
-					GIT_BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
-					GIT_COMMITHASH: JSON.stringify(gitRevisionPlugin.commithash()),
-				},
 			}),
 			new MiniCssExtractPlugin({
 				filename: 'style.css',

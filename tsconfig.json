@@ -17,33 +17,15 @@
 		],
 		"baseUrl": ".",
 		"paths": {
-			"@styles": [
-				"./src/core/styles/index"
-			],
-			"@api/*": [
-				"./src/core/api/*"
+			"@core/*": [
+				"./src/core/*"
 			],
 			"@ui/*": [
-				"./src/core/ui/*"
+				"./src/ui/*"
 			],
 			"@utils/*": [
-				"./src/core/utils/*"
-			],
-			"@routing": [
-				"./src/core/routing"
-			],
-			"@theme": [
-				"./src/core/theme/index"
-			],
-			"@hooks/*": [
-				"./src/core/hooks/*"
-			],
-			"@modules/*": [
-				"./src/modules/*"
-			],
-			"@assets/*": [
-				"./src/assets/*"
-			],
+				"./src/utils/*"
+			]
 		}
 	},
 	"include": [

@@ -5,12 +5,11 @@ const { resolve } = require('path');
 function createHtmlPluginOptions(env) {
 	const isProduction = Boolean(env.production);
 	const map = {
-		template: resolve('src', 'index.ejs'),
+		template: resolve('src', 'ui', 'index.ejs'),
 		hash: !isProduction,
 		inject: false,
 		baseURL: '/',
 		title: 'Mark',
-		pwaResourcePath: './src/assets/pwa/seeneco',
 	};
 
 	return map;

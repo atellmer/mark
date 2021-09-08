@@ -79,6 +79,9 @@
 		],
 		"@typescript-eslint/unbound-method": [
 			"off"
+		],
+		"@typescript-eslint/restrict-plus-operands": [
+			"off"
 		]
 	}
 }
