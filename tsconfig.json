@@ -1,0 +1,53 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"moduleResolution": "node",
+		"module": "esnext",
+		"outDir": "./dist/",
+		"sourceMap": true,
+		"noImplicitAny": false,
+		"removeComments": false,
+		"downlevelIteration": true,
+		"allowSyntheticDefaultImports": true,
+		"jsx": "react",
+		"lib": [
+			"es6",
+			"es7",
+			"dom"
+		],
+		"baseUrl": ".",
+		"paths": {
+			"@styles": [
+				"./src/core/styles/index"
+			],
+			"@api/*": [
+				"./src/core/api/*"
+			],
+			"@ui/*": [
+				"./src/core/ui/*"
+			],
+			"@utils/*": [
+				"./src/core/utils/*"
+			],
+			"@routing": [
+				"./src/core/routing"
+			],
+			"@theme": [
+				"./src/core/theme/index"
+			],
+			"@hooks/*": [
+				"./src/core/hooks/*"
+			],
+			"@modules/*": [
+				"./src/modules/*"
+			],
+			"@assets/*": [
+				"./src/assets/*"
+			],
+		}
+	},
+	"include": [
+		"./src/**/*",
+		"./*.js"
+	]
+}
