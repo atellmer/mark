@@ -13,7 +13,16 @@ const exchangeApi = {
 	makeOrder: (options: MakeOrderOptions) => {
 		return new Promise<boolean>((resolve, reject) => {
 			setTimeout(() => {
+
+				console.log('options', options)
 				resolve(true);
+			}, 100);
+		});
+	},
+	fetchAccountBalance: (options: FetchAccountBalanceOptions) => {
+		return new Promise<number>((resolve, reject) => {
+			setTimeout(() => {
+				resolve(10000);
 			}, 100);
 		});
 	},
@@ -28,6 +37,11 @@ export type MakeOrderOptions = {
 	direction: OrderDirection;
 	type: OrderType;
 	amount: number;
+	currentPrice: number;
+	stopLoss: number;
+	takeProfit: number;
 };
+
+export type FetchAccountBalanceOptions = {};
 
 export { exchangeApi };

@@ -1,23 +1,41 @@
 import { StrategyAnsible, TradingDecision } from '../strategy';
-import { Trader } from '../trader';
+import { Trader, MakeOrderOptions } from '../trader';
 import { MarketSubscriber, Price, OrderType } from '../market';
+import { MoneyManagement } from '../money';
 
 class Bot implements MarketSubscriber {
+	symbol: string;
 	ansible: StrategyAnsible;
 	trader: Trader;
+	mm: MoneyManagement;
 
-	constructor(ansible: StrategyAnsible, trader: Trader) {
+	constructor(symbol: string, ansible: StrategyAnsible, trader: Trader, mm: MoneyManagement) {
+		this.symbol = symbol;
 		this.ansible = ansible;
 		this.trader = trader;
+		this.mm = mm;
 	}
 
 	async notify(price: Price) {
 		const decision = await this.ansible.getDecision({ price });
+		const hasDeal = [TradingDecision.BUY, TradingDecision.SELL].includes(decision);
 
-		if (decision === TradingDecision.BUY) {
-			await this.trader.buy({ amount: 1000, type: OrderType.MARKET });
-		} else if (decision === TradingDecision.SELL) {
-			await this.trader.sell({ amount: 1000, type: OrderType.MARKET });
+		if (hasDeal) {
+			const { amount, stopLoss, takeProfit } = await this.mm.getOrderParameters(price);
+			const options: MakeOrderOptions = {
+				symbol: this.symbol,
+				type: OrderType.MARKET,
+				amount,
+				stopLoss,
+				takeProfit,
+				currentPrice: price.close,
+			};
+
+			if (decision === TradingDecision.BUY) {
+				await this.trader.buy(options);
+			} else if (decision === TradingDecision.SELL) {
+				await this.trader.sell(options);
+			}
 		}
 	}
 }
