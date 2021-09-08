@@ -35,9 +35,9 @@ const Checkbox: React.FC<CheckboxProps> = props => {
 					<Outline />
 					<IconLayout key={checked ? 1 : 2}>
 						{checked ? (
-							<CheckboxCheckedIcon color={disabled ? 'muted' : 'accent'} size={24} />
+							<CheckboxCheckedIcon color={disabled ? 'text' : 'accent'} size={24} />
 						) : (
-							<CheckboxUncheckedIcon color={disabled ? 'muted' : 'black'} size={24} />
+							<CheckboxUncheckedIcon color={disabled ? 'text' : 'black'} size={24} />
 						)}
 					</IconLayout>
 				</span>

@@ -114,7 +114,7 @@ const Label = styled(({ ...rest }: LabelProps) => (
 	<Text component='label' fontWeight={400} lineHeight={1.25} textAlign='left' {...rest} />
 ))`
 	${(p: LabelProps) => css`
-		color: ${p.theme.palette.label};
+		color: ${p.theme.palette.hint};
 	`}
 
 	${(p: LabelProps) =>

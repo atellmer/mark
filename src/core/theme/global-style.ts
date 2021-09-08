@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
 		}
 
 		body {
-			background-color: ${p.theme.palette.background};
+			background-color: ${p.theme.palette.space};
 			color: ${p.theme.palette.text};
 		}
 
@@ -32,7 +32,7 @@ const GlobalStyle = createGlobalStyle`
 		}
 
 		::-webkit-scrollbar-track {
-			background-color: ${darken(p.theme.palette.background, 0.05)};
+			background-color: ${darken(p.theme.palette.space, 0.05)};
 		}
 	`}
 

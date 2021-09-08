@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { Theme } from '@theme';
 
 export type IconBaseProps = {
-	color?: 'accent' | 'muted' | 'black' | 'light';
+	color?: 'accent' | 'text';
 	size?: number;
 } & React.HTMLAttributes<unknown>;
 
@@ -58,10 +58,7 @@ const IconStyled = styled.i.withConfig({
 const getColor = (colorAlias: string, theme: Theme) => {
 	const colorMap = {
 		accent: theme.palette.accent,
-		muted: theme.palette.label,
-		black: theme.palette.text,
-		alarm: theme.palette.alarm,
-		light: theme.palette.textContrast,
+		text: theme.palette.text,
 	};
 
 	return colorMap[colorAlias];

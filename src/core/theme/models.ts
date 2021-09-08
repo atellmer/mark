@@ -13,11 +13,8 @@ export type Theme = {
 		warning: string;
 		alarm: string;
 		text: string;
-		textContrast: string;
-		label: string;
 		hint: string;
 		stealth: string;
-		background: string;
 		space: string;
 	};
 	button: {

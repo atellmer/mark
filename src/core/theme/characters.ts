@@ -7,16 +7,13 @@ const themesMap: ThemesByBrandsMap = {
 		fontSize: '14px',
 		lineHeight: '1.2',
 		palette: {
-			accent: '#26d06d',
+			accent: '#86005B',
 			warning: '#ffc107',
-			alarm: '#ff3a48',
-			text: '#262626',
-			textContrast: '#fff',
-			label: '#8c8c8c',
-			hint: '#bfbfbf',
-			stealth: '#ebebeb',
-			background: '#E8EAF6',
-			space: '#fff',
+			alarm: '#AC0014',
+			text: '#fff',
+			hint: '#55084C',
+			stealth: '#3D0C45',
+			space: '#24103D',
 		},
 		button: {
 			contained: {

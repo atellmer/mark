@@ -39,11 +39,10 @@ function clamp(value, min, max) {
 }
 
 function convertColorToString(color) {
-	let type = color.type,
-		values = color.values;
+	const type = color.type;
+	const values = color.values;
 
 	if (type.indexOf('rgb') > -1) {
-		// Only convert the first 3 values to int (i.e. not alpha)
 		for (let i = 0; i < 3; i++) {
 			values[i] = parseInt(values[i]);
 		}
@@ -52,13 +51,13 @@ function convertColorToString(color) {
 	let colorString = void 0;
 
 	if (type.indexOf('hsl') > -1) {
-		colorString = color.type + '(' + values[0] + ', ' + values[1] + '%, ' + values[2] + '%';
+		colorString = `${color.type}(${values[0]}, ${values[1]}%, ${values[2]}%`;
 	} else {
-		colorString = color.type + '(' + values[0] + ', ' + values[1] + ', ' + values[2];
+		colorString = `${color.type}(${values[0]}, ${values[1]}, ${values[2]}`;
 	}
 
 	if (values.length === 4) {
-		colorString += ', ' + color.values[3] + ')';
+		colorString += `, ${color.values[3]})`;
 	} else {
 		colorString += ')';
 	}
@@ -70,18 +69,18 @@ function convertHexToRGB(color) {
 	if (color.length === 4) {
 		let extendedColor = '#';
 		for (let i = 1; i < color.length; i++) {
-			extendedColor += color.charAt(i) + color.charAt(i);
+			extendedColor += `${color.charAt(i)}${color.charAt(i)}`;
 		}
 		color = extendedColor;
 	}
 
-	let values = {
+	const values = {
 		r: parseInt(color.substr(1, 2), 16),
 		g: parseInt(color.substr(3, 2), 16),
 		b: parseInt(color.substr(5, 2), 16),
 	};
 
-	return 'rgb(' + values.r + ', ' + values.g + ', ' + values.b + ')';
+	return `rgb(${values.r}, ${values.g}, ${values.b})`;
 }
 
 function decomposeColor(color) {
@@ -89,10 +88,10 @@ function decomposeColor(color) {
 		return decomposeColor(convertHexToRGB(color));
 	}
 
-	let marker = color.indexOf('(');
+	const marker = color.indexOf('(');
 
-	let type = color.substring(0, marker);
-	let values = color.substring(marker + 1, color.length - 1).split(',');
+	const type = color.substring(0, marker);
+	let values = color.substring(Number(marker) + 1, color.length - 1).split(',');
 	values = values.map(function (value) {
 		return parseFloat(value);
 	});

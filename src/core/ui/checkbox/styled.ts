@@ -60,7 +60,7 @@ const Root = styled.label<RootProps>`
 				pointer-events: none;
 			}
 
-			color: ${p.theme.palette.label};
+			color: ${p.theme.palette.hint};
 		`}
 `;
 

@@ -8,7 +8,7 @@ const Root = styled.div`
 	display: flex;
 
 	${p => css`
-		background-color: ${p.theme.palette.background};
+		background-color: ${p.theme.palette.space};
 	`}
 
 	@media(min-width: 600px) {
