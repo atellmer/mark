@@ -43,7 +43,7 @@ const createConfig = function (env) {
 		module: {
 			rules: [
 				{
-					test: /\.(js|ts|tsx)$/,
+					test: /\.(js|json|ts|tsx)$/,
 					loader: 'ts-loader',
 					options: {
 						transpileOnly: true,

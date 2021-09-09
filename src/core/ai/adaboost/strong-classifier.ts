@@ -5,15 +5,15 @@ import { WeakClassifier } from './weak-classifier';
 import { ProbabilitySelector } from './probability-selector';
 
 class StrongClassifier {
-	private weakClassifier: WeakClassifier;
+	private weak: WeakClassifier;
 	private alfa: number;
 
 	public getWeakClassifier(): WeakClassifier {
-		return this.weakClassifier;
+		return this.weak;
 	}
 
-	public setWeakClassifier(weakClassifier: WeakClassifier) {
-		this.weakClassifier = weakClassifier;
+	public setWeakClassifier(weak: WeakClassifier) {
+		this.weak = weak;
 	}
 
 	public getAlfa(): number {
@@ -39,7 +39,7 @@ class StrongClassifier {
 		}
 
 		for (let k = 0; k < estimatorsNumber; k++) {
-			const weakClassifier = WeakClassifier.train(selectedSamples);
+			const weak = WeakClassifier.train(selectedSamples);
 			const strong = new StrongClassifier();
 			epsilon = 0;
 			weightsSum = 0;
@@ -47,9 +47,9 @@ class StrongClassifier {
 
 			for (let i = 0; i < size; i++) {
 				predictions[i] = WeakClassifier.predict(
-					samples[i].getPattern()[weakClassifier.getFeatureIndex()],
-					weakClassifier.getThreshold(),
-					weakClassifier.getDirection(),
+					samples[i].getPattern()[weak.getFeatureIndex()],
+					weak.getThreshold(),
+					weak.getDirection(),
 				);
 
 				if (samples[i].getAnswer() != predictions[i]) {
@@ -67,7 +67,7 @@ class StrongClassifier {
 
 			alfa = 0.5 * log((1 - epsilon) / epsilon);
 
-			strong.setWeakClassifier(weakClassifier);
+			strong.setWeakClassifier(weak);
 			strong.setAlfa(alfa);
 			classifiers[k] = strong;
 
@@ -86,19 +86,14 @@ class StrongClassifier {
 	}
 
 	public static predict(pattern: Array<number>, classifiers: Array<StrongClassifier>): Answer {
-		let weakClassifier: WeakClassifier;
+		let weak: WeakClassifier;
 		let answer = 0;
 
 		for (let k = 0; k < classifiers.length; k++) {
-			weakClassifier = classifiers[k].getWeakClassifier();
-
+			weak = classifiers[k].getWeakClassifier();
 			answer +=
 				classifiers[k].getAlfa() *
-				WeakClassifier.predict(
-					pattern[weakClassifier.getFeatureIndex()],
-					weakClassifier.getThreshold(),
-					weakClassifier.getDirection(),
-				);
+				WeakClassifier.predict(pattern[weak.getFeatureIndex()], weak.getThreshold(), weak.getDirection());
 		}
 
 		if (answer > 0) {
@@ -108,5 +103,14 @@ class StrongClassifier {
 		return Answer.NEGATIVE;
 	}
 }
+
+export type StrongClassifierObject = {
+	alfa: number;
+	weak: {
+		direction: number;
+		featureIndex: number;
+		threshold: number;
+	};
+};
 
 export { StrongClassifier };

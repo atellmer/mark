@@ -1,17 +1,18 @@
 import { createListFromMap, detectIsUndefined, firstTrueKey } from '@utils/helpers';
+import { saveJsonToFile } from '@utils/file';
 import { Sample } from '../sample';
-import { StrongClassifier } from '../adaboost';
+import { StrongClassifier, StrongClassifierObject, WeakClassifier } from './';
 
-class AdaBoost {
-	private samples: Array<Sample> = [];
-	private estimatorsNumber: number;
+export type AdaBoostOptions = {
+	samples?: Array<Sample>;
+	estimatorsNumber?: number;
+	trained?: RecoveryModel;
+};
 
-	constructor(samples: Array<Sample>, estimatorsNumber: number) {
-		this.samples = samples;
-		this.estimatorsNumber = estimatorsNumber;
-	}
+function adaboost(options: AdaBoostOptions): TrainedModel {
+	const { samples, estimatorsNumber, trained } = options;
 
-	private static transformSamples(samples: Array<Sample>, label: number): Array<Sample> {
+	const transformSamples = (samples: Array<Sample>, label: number): Array<Sample> => {
 		const transformedSamples = [];
 
 		for (let i = 0; i < samples.length; i++) {
@@ -29,9 +30,9 @@ class AdaBoost {
 		}
 
 		return transformedSamples;
-	}
+	};
 
-	private static getLabels(samples: Array<Sample>): Array<number> {
+	const getLabels = (samples: Array<Sample>): Array<number> => {
 		const map: Record<number, number> = {};
 
 		for (const sample of samples) {
@@ -43,30 +44,71 @@ class AdaBoost {
 		}
 
 		return createListFromMap(map);
-	}
+	};
 
-	public train(): AdaBoostTrainedModel {
-		const labels = AdaBoost.getLabels(this.samples);
+	const train = (): TrainedModel => {
+		const labels = getLabels(samples);
 		const map: Record<number, Array<StrongClassifier>> = {};
 
 		for (let i = 0; i < labels.length; i++) {
-			const transformedSamples = AdaBoost.transformSamples(this.samples, labels[i]);
-			const classifiers = StrongClassifier.train(transformedSamples, this.estimatorsNumber);
+			const transformedSamples = transformSamples(samples, labels[i]);
+			const classifiers = StrongClassifier.train(transformedSamples, estimatorsNumber);
 
 			map[i] = classifiers;
 		}
 
-		return new AdaBoostTrainedModel(labels, map);
-	}
+		return new TrainedModel(labels, map);
+	};
+
+	const recovery = (): TrainedModel => {
+		const labels = trained.labels;
+		const classifiersMap: Record<number, Array<StrongClassifier>> = {};
+
+		for (let i = 0; i < labels.length; i++) {
+			const items = trained.classifiersMap[i];
+
+			for (let j = 0; j < items.length; j++) {
+				const item = items[j];
+				const strong = new StrongClassifier();
+				const weak = new WeakClassifier();
+
+				weak.setDirection(item.weak.direction);
+				weak.setFeatureIndex(item.weak.featureIndex);
+				weak.setThreshold(item.weak.threshold);
+
+				strong.setAlfa(item.alfa);
+				strong.setWeakClassifier(weak);
+
+				if (!classifiersMap[i]) {
+					classifiersMap[i] = [];
+				}
+
+				classifiersMap[i].push(strong);
+			}
+		}
+
+		return new TrainedModel(labels, classifiersMap);
+	};
+
+	return trained ? recovery() : train();
 }
 
-class AdaBoostTrainedModel {
+class TrainedModel {
 	private labels: Array<number> = [];
 	private classifiersMap: Record<number, Array<StrongClassifier>> = {};
 
 	constructor(labels: Array<number>, classifiersMap: Record<number, Array<StrongClassifier>>) {
 		this.labels = labels;
 		this.classifiersMap = classifiersMap;
+	}
+
+	public toJSON(filename: string) {
+		const json = JSON.stringify({
+			labels: this.labels,
+			classifiersMap: this.classifiersMap,
+		});
+
+		saveJsonToFile(json, filename);
 	}
 
 	public predict(pattern: Array<number>) {
@@ -86,4 +128,9 @@ class AdaBoostTrainedModel {
 	}
 }
 
-export { AdaBoost };
+type RecoveryModel = {
+	labels: Array<number>;
+	classifiersMap: Record<number, Array<StrongClassifierObject>>;
+};
+
+export { adaboost };

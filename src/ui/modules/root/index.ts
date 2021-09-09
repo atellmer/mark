@@ -1,10 +1,11 @@
 import { Sample } from '@core/ai/sample';
-import { AdaBoost } from '@core/ai/adaboost';
+import { adaboost } from '@core/ai/adaboost';
 import { Market } from '@core/market';
 import { Bot } from '@core/bot';
 import { Trader } from '@core/trader';
 import { StrategyAnsible, RandomStrategy } from '@core/strategy';
 import { MoneyManagement, RiskTactics } from '@core/money';
+import trained from '@core/ai/adaboost/trained/x.json';
 
 function init() {
 	// const symbol = 'btc_usdt';
@@ -35,17 +36,9 @@ function init() {
 		new Sample([55, 170, 15, 2], 1),
 	]);
 
-	const adaBoost = new AdaBoost(trainSamples, 10);
-	const model = adaBoost.train();
+	//const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
+	const model = adaboost({ trained });
 	const predict = model.predict(testSamples[0].getPattern());
-
-	console.log('predict', predict)
-
-	// for (const sample of testSamples) {
-	// 	const predict = StrongClassifier.predict(sample.getPattern(), classifiers);
-	// }
-
-	// console.log('end')
 }
 
 init();
