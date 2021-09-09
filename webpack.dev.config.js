@@ -83,6 +83,15 @@ const createConfig = function (env) {
 						},
 					],
 				},
+				{
+					test: /\.csv$/,
+					loader: 'csv-loader',
+					options: {
+						dynamicTyping: true,
+						header: false,
+						skipEmptyLines: true,
+					},
+				},
 			],
 		},
 		plugins: [

@@ -6,6 +6,8 @@ import { Trader } from '@core/trader';
 import { StrategyAnsible, RandomStrategy } from '@core/strategy';
 import { MoneyManagement, RiskTactics } from '@core/money';
 import trained from '@core/ai/adaboost/trained/x.json';
+import irisesTrainDataset from '@core/ai/datasets/irises/train.csv';
+import irisesTestDataset from '@core/ai/datasets/irises/test.csv';
 
 function init() {
 	// const symbol = 'btc_usdt';
@@ -19,27 +21,35 @@ function init() {
 	// market.subscribe(bot);
 	// market.start();
 
-	const trainSamples: Array<Sample> = Sample.normalize([
-		new Sample([70, 200, 18, 1], 1),
-		new Sample([70, 170, 16, 1], 1),
-		new Sample([95, 182, 24, 1], 1),
-		new Sample([130, 115, 25, 2], 2),
-		new Sample([65, 90, 60, 2], 2),
-		new Sample([60, 101, 40, 2], 2),
-	]);
-	const testSamples: Array<Sample> = Sample.normalize([
-		new Sample([80, 120, 6, 1], 2),
-		new Sample([50, 110, 50, 2], 2),
-		new Sample([50, 100, 50, 2], 2),
-		new Sample([90, 190, 20, 1], 1),
-		new Sample([80, 180, 18, 2], 1),
-		new Sample([55, 170, 15, 2], 1),
-	]);
+	// const trainSamples: Array<Sample> = Sample.normalize([
+	// 	new Sample([70, 200, 18, 1], 1),
+	// 	new Sample([70, 170, 16, 1], 1),
+	// 	new Sample([95, 182, 24, 1], 1),
+	// 	new Sample([130, 115, 25, 2], 2),
+	// 	new Sample([65, 90, 60, 2], 2),
+	// 	new Sample([60, 101, 40, 2], 2),
+	// ]);
+	// const testSamples: Array<Sample> = Sample.normalize([
+	// 	new Sample([80, 120, 6, 1], 2),
+	// 	new Sample([50, 110, 50, 2], 2),
+	// 	new Sample([50, 100, 50, 2], 2),
+	// 	new Sample([90, 190, 20, 1], 1),
+	// 	new Sample([80, 180, 18, 2], 1),
+	// 	new Sample([55, 170, 15, 2], 1),
+	// ]);
 
-	//const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
-	const model = adaboost({ trained });
+	// //const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
+	// const model = adaboost({ trained });
+	// const result = model.verasity(trainSamples, testSamples);
+	// const predict = model.predict(testSamples[0].getPattern());
+
+	// console.log('result', result);
+
+	const trainSamples = Sample.normalize(Sample.fromDataset(irisesTrainDataset));
+	const testSamples = Sample.normalize(Sample.fromDataset(irisesTestDataset));
+
+	const model = adaboost({ samples: trainSamples, estimatorsNumber: 1000 });
 	const result = model.verasity(trainSamples, testSamples);
-	const predict = model.predict(testSamples[0].getPattern());
 
 	console.log('result', result);
 }

@@ -49,6 +49,23 @@ class Sample {
 
 		return normalized;
 	}
+
+	public static fromDataset(dataset: Array<Array<number>>): Array<Sample> {
+		const samples: Array<Sample> = [];
+
+		for (const item of dataset) {
+			const lastIndex = item.length - 1;
+			const answer = Number(item[lastIndex]);
+			const pattern = item
+				.slice(0, lastIndex)
+				.map(x => String(x).replace(',', '.'))
+				.map(Number);
+
+			samples.push(new Sample(pattern, answer));
+		}
+
+		return samples;
+	}
 }
 
 export { Sample };
