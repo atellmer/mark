@@ -1,39 +1,39 @@
-import * as math from 'mathjs';
+import * as mathjs from 'mathjs';
 
 function mean(values: Array<number>): number {
-	return math.mean(values);
+	return mathjs.mean(values);
 }
 
 function pow(x: number, y: number): number {
-	return math.pow(x, y) as number;
+	return Math.pow(x, y);
 }
 
 function sqrt(x: number): number {
-	return math.sqrt(x);
+	return Math.sqrt(x);
 }
 
 function exp(x: number): number {
-	return math.exp(x);
+	return Math.exp(x);
 }
 
 function random(min?: number, max?: number): number {
-	return math.random(min, max);
+	return mathjs.random(min, max);
 }
 
 function abs(x: number): number {
-	return math.abs(x);
+	return Math.abs(x);
 }
 
 function log(x: number): number {
-	return math.log(x);
+	return Math.log(x);
 }
 
 function min(values: Array<number>): number {
-	return math.min(values);
+	return Math.min(...values);
 }
 
 function max(values: Array<number>): number {
-	return math.max(values);
+	return Math.max(...values);
 }
 
 function fixed(x: number): number {

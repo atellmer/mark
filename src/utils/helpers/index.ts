@@ -31,8 +31,4 @@ function keysCount<T extends object>(value: T): number {
 	return Object.keys(value).length;
 }
 
-function firstTrueKey<T extends object>(value: T): string {
-	return Object.keys(value).find(x => value[x] === true);
-}
-
-export { detectIsFunction, detectIsUndefined, groupBy, createListFromMap, keysCount, firstTrueKey };
+export { detectIsFunction, detectIsUndefined, groupBy, createListFromMap, keysCount };

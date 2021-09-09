@@ -40,8 +40,8 @@ class Sample {
 		return new Sample(patternNormalized, sample.getAnswer());
 	}
 
-	public static normalize(samples: Array<Sample>) {
-		const normalized = [];
+	public static normalize(samples: Array<Sample>): Array<Sample> {
+		const normalized: Array<Sample> = [];
 
 		for (const sample of samples) {
 			normalized.push(Sample.normalizeOne(sample));

@@ -41,34 +41,35 @@ class StrongClassifier {
 		for (let k = 0; k < estimatorsNumber; k++) {
 			const weak = WeakClassifier.train(selectedSamples);
 			const strong = new StrongClassifier();
+
 			epsilon = 0;
 			weightsSum = 0;
 			alfa = 0;
 
 			for (let i = 0; i < size; i++) {
-				predictions[i] = WeakClassifier.predict(
-					samples[i].getPattern()[weak.getFeatureIndex()],
-					weak.getThreshold(),
-					weak.getDirection(),
-				);
+				const pattern = samples[i].getPattern();
+				const answer = samples[i].getAnswer();
 
-				if (samples[i].getAnswer() != predictions[i]) {
+				predictions[i] = weak.predict(pattern[weak.getFeatureIndex()]);
+
+				if (answer !== predictions[i]) {
 					epsilon += weights[i];
 				}
 			}
 
-			if (epsilon === 0) {
+			if (epsilon <= 0) {
 				epsilon = 0.000000000000001;
 			}
 
-			if (epsilon === 1) {
+			if (epsilon >= 1) {
 				epsilon = 0.999999999999999;
 			}
 
 			alfa = 0.5 * log((1 - epsilon) / epsilon);
 
-			strong.setWeak(weak);
 			strong.setAlfa(alfa);
+			strong.setWeak(weak);
+
 			classifiers[k] = strong;
 
 			for (let i = 0; i < size; i++) {
@@ -86,14 +87,14 @@ class StrongClassifier {
 	}
 
 	public static predict(pattern: Array<number>, classifiers: Array<StrongClassifier>): Answer {
-		let weak: WeakClassifier;
 		let answer = 0;
 
-		for (let k = 0; k < classifiers.length; k++) {
-			weak = classifiers[k].getWeak();
-			answer +=
-				classifiers[k].getAlfa() *
-				WeakClassifier.predict(pattern[weak.getFeatureIndex()], weak.getThreshold(), weak.getDirection());
+		for (let i = 0; i < classifiers.length; i++) {
+			const alfa = classifiers[i].getAlfa();
+			const weak = classifiers[i].getWeak();
+			const prediction = weak.predict(pattern[weak.getFeatureIndex()]) as number;
+
+			answer += alfa * prediction;
 		}
 
 		if (answer > 0) {

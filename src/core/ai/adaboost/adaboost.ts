@@ -1,6 +1,6 @@
-import { createListFromMap, detectIsUndefined, firstTrueKey } from '@utils/helpers';
+import { createListFromMap, detectIsUndefined } from '@utils/helpers';
 import { saveJsonToFile } from '@utils/file';
-import { fixed } from '@utils/math';
+import { fixed, max } from '@utils/math';
 import { Sample } from '../sample';
 import { StrongClassifier, StrongClassifierObject, WeakClassifier } from './';
 
@@ -103,6 +103,22 @@ class TrainedModel {
 		this.classifiersMap = classifiersMap;
 	}
 
+	public predict(pattern: Array<number>) {
+		const values: Array<number> = [];
+
+		for (let i = 0; i < this.labels.length; i++) {
+			const classifiers = this.classifiersMap[i];
+			const predict = StrongClassifier.predict(pattern, classifiers);
+
+			values.push(predict);
+		}
+
+		const idx = values.indexOf(max(values));
+		const predict = this.labels[idx];
+
+		return predict;
+	}
+
 	public toJSON(filename: string) {
 		const json = JSON.stringify({
 			labels: this.labels,
@@ -113,47 +129,18 @@ class TrainedModel {
 	}
 
 	public verasity(trainSamples: Array<Sample>, testSamples: Array<Sample>) {
-		const train = {
-			correctPercent: 0,
-			incorectPercent: 0,
-			incorrectCount: 0,
-			total: trainSamples.length,
-		};
-		const test = {
-			correctPercent: 0,
-			incorectPercent: 0,
-			incorrectCount: 0,
-			total: testSamples.length,
-		};
+		let trainError = 0;
+		let testError = 0;
+		const trainValue = this.bench(trainSamples);
+		const testValue = this.bench(testSamples);
 
-		train.incorrectCount = this.bench(trainSamples);
-		train.incorectPercent = fixed((train.incorrectCount / trainSamples.length) * 100);
-		train.correctPercent = fixed(100 - train.incorectPercent);
-
-		test.incorrectCount = this.bench(testSamples);
-		test.incorectPercent = fixed((test.incorrectCount / testSamples.length) * 100);
-		test.correctPercent = fixed(100 - test.incorectPercent);
+		trainError = fixed((trainValue / trainSamples.length) * 100);
+		testError = fixed((testValue / testSamples.length) * 100);
 
 		return {
-			train,
-			test,
+			trainError,
+			testError,
 		};
-	}
-
-	public predict(pattern: Array<number>) {
-		const map = {};
-
-		for (let i = 0; i < this.labels.length; i++) {
-			const classifiers = this.classifiersMap[i];
-			const label = this.labels[i];
-			const predict = StrongClassifier.predict(pattern, classifiers);
-
-			map[label] = predict === 1;
-		}
-
-		const predict = Number(firstTrueKey(map));
-
-		return predict;
 	}
 
 	private bench = (samples: Array<Sample>) => {

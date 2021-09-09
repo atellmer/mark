@@ -33,15 +33,15 @@ class WeakClassifier {
 
 	public static train(samples: Array<Sample>): WeakClassifier {
 		const size = samples.length;
-		const length = samples[0].getPattern().length;
+		const patternLength = samples[0].getPattern().length;
 		const features: Array<Feature> = [];
 		const error: Array<number> = [];
 		const weak = new WeakClassifier();
-		let threshold = 0;
-		let direction: Direction = null;
 		let minimalError = Number.POSITIVE_INFINITY;
 
-		for (let j = 0; j < length; j++) {
+		for (let j = 0; j < patternLength; j++) {
+			const featureIndex = j;
+
 			for (let i = 0; i < size; i++) {
 				features[i] = {
 					value: samples[i].getPattern()[j],
@@ -52,27 +52,32 @@ class WeakClassifier {
 			features.sort((a, b) => a.value - b.value);
 
 			for (let i = 0; i < size - 1; i++) {
-				if (features[i].answer != features[i + 1].answer && features[i].value != features[i + 1].value) {
-					threshold = (features[i].value + features[i + 1].value) / 2.0;
+				const currentAnswer = features[i].answer;
+				const currentValue = features[i].value;
+				const siblingAnswer = features[i + 1].answer;
+				const siblingValue = features[i + 1].value;
 
-					if (features[i].answer >= 0) {
-						direction = Direction.UP;
-					} else {
-						direction = Direction.DOWN;
-					}
+				if (currentAnswer === siblingAnswer || currentValue === siblingValue) {
+					continue;
+				}
 
-					error[j] = 0;
+				const threshold = (currentValue + siblingValue) / 2.0;
+				const direction: Direction = currentAnswer === Answer.POSITIVE ? Direction.UP : Direction.DOWN;
 
-					for (let k = 0; k < size; k++) {
-						error[j] += abs(features[k].answer - WeakClassifier.predict(features[k].value, threshold, direction)) / 2.0;
-					}
+				error[j] = 0.0;
 
-					if (error[j] < minimalError) {
-						minimalError = error[j];
-						weak.setFeatureIndex(j);
-						weak.setThreshold(threshold);
-						weak.setDirection(direction);
-					}
+				for (let k = 0; k < size; k++) {
+					const featureValue = features[k].value;
+
+					error[j] += abs(features[k].answer - weak.predict(featureValue, threshold, direction)) / 2.0;
+				}
+
+				if (error[j] < minimalError) {
+					minimalError = error[j];
+
+					weak.setFeatureIndex(featureIndex);
+					weak.setThreshold(threshold);
+					weak.setDirection(direction);
 				}
 			}
 		}
@@ -80,16 +85,16 @@ class WeakClassifier {
 		return weak;
 	}
 
-	public static predict(value: number, treshold: number, direction: Direction): Answer {
-		if (direction > 0) {
-			if (value <= treshold) {
+	public predict(featureValue: number, threshold = this.threshold, direction: Direction = this.direction): Answer {
+		if (direction === Direction.UP) {
+			if (featureValue <= threshold) {
 				return Answer.POSITIVE;
 			}
 
 			return Answer.NEGATIVE;
 		}
 
-		if (value <= treshold) {
+		if (featureValue <= threshold) {
 			return Answer.NEGATIVE;
 		}
 

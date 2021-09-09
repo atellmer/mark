@@ -1,5 +1,5 @@
 import { Sample } from '@core/ai/sample';
-import { adaboost } from '@core/ai/adaboost';
+import { adaboost, StrongClassifier } from '@core/ai/adaboost';
 import { Market } from '@core/market';
 import { Bot } from '@core/bot';
 import { Trader } from '@core/trader';
@@ -21,37 +21,56 @@ function init() {
 	// market.subscribe(bot);
 	// market.start();
 
-	// const trainSamples: Array<Sample> = Sample.normalize([
-	// 	new Sample([70, 200, 18, 1], 1),
-	// 	new Sample([70, 170, 16, 1], 1),
-	// 	new Sample([95, 182, 24, 1], 1),
-	// 	new Sample([130, 115, 25, 2], 2),
-	// 	new Sample([65, 90, 60, 2], 2),
-	// 	new Sample([60, 101, 40, 2], 2),
-	// ]);
-	// const testSamples: Array<Sample> = Sample.normalize([
-	// 	new Sample([80, 120, 6, 1], 2),
-	// 	new Sample([50, 110, 50, 2], 2),
-	// 	new Sample([50, 100, 50, 2], 2),
-	// 	new Sample([90, 190, 20, 1], 1),
-	// 	new Sample([80, 180, 18, 2], 1),
-	// 	new Sample([55, 170, 15, 2], 1),
-	// ]);
+	const trainSamples: Array<Sample> = ([
+		new Sample([1, 150, 85, 4], 1),
+		new Sample([1, 140, 80, 4], 1),
+		new Sample([1, 130, 70, 4], 1),
+		new Sample([1, 90, 90, 4], 1),
+		new Sample([1, 90, 100, 4], -1),
+		new Sample([1, 80, 110, 4], -1),
+		new Sample([1, 70, 120, 4], -1),
+	]);
+	const testSamples: Array<Sample> = ([
+		new Sample([1, 131, 76, 4], 1),
+		new Sample([3, 129, 86, 6], 1),
+		new Sample([5, 98, 83, 8], 1),
+		new Sample([2, 92, 111, 5], -1),
+		new Sample([6, 82, 121, 9], -1),
+		new Sample([4, 72, 131, 7], -1),
+	]);
 
-	// //const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
-	// const model = adaboost({ trained });
-	// const result = model.verasity(trainSamples, testSamples);
-	// const predict = model.predict(testSamples[0].getPattern());
-
-	// console.log('result', result);
-
-	const trainSamples = Sample.normalize(Sample.fromDataset(irisesTrainDataset));
-	const testSamples = Sample.normalize(Sample.fromDataset(irisesTestDataset));
-
-	const model = adaboost({ samples: trainSamples, estimatorsNumber: 1000 });
+	const model = adaboost({ samples: trainSamples, estimatorsNumber: 1 });
 	const result = model.verasity(trainSamples, testSamples);
+	//const predict = model.predict(testSamples[0].getPattern());
 
 	console.log('result', result);
+
+	const classifiers = StrongClassifier.train(trainSamples, 1);
+
+	for (const sample of testSamples) {
+		const prediction = StrongClassifier.predict(sample.getPattern(), classifiers);
+
+		console.log('sample', sample);
+		console.log('prediction', prediction);
+	}
+
+	// const trainSamples = Sample.fromDataset(irisesTrainDataset);
+	// const testSamples = Sample.fromDataset(irisesTestDataset);
+
+	// const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
+	// const result = model.verasity(trainSamples, testSamples);
+
+	// console.log('result', result)
+
+	// for (const sample of trainSamples) {
+	// 	const prediction = model.predict(sample.getPattern());
+
+	// 	if (prediction !== sample.getAnswer()) {
+	// 		console.log('sample', sample);
+	// 		console.log('prediction', prediction);
+	// 		break;
+	// 	}
+	// }
 }
 
 init();
