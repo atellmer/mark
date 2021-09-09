@@ -24,7 +24,7 @@ class StrongClassifier {
 		this.alfa = alfa;
 	}
 
-	public static train(samples: Array<Sample>, iterationCount: number): Array<StrongClassifier> {
+	public static train(samples: Array<Sample>, estimatorsNumber: number): Array<StrongClassifier> {
 		const size = samples.length;
 		const weights: Array<number> = [];
 		const predictions: Array<Answer> = [];
@@ -38,15 +38,15 @@ class StrongClassifier {
 			weights[i] = 1 / size;
 		}
 
-		for (let k = 0; k < iterationCount; k++) {
+		for (let k = 0; k < estimatorsNumber; k++) {
 			const weakClassifier = WeakClassifier.train(selectedSamples);
-			const strongClassifier = new StrongClassifier();
+			const strong = new StrongClassifier();
 			epsilon = 0;
 			weightsSum = 0;
 			alfa = 0;
 
 			for (let i = 0; i < size; i++) {
-				predictions[i] = WeakClassifier.getPredict(
+				predictions[i] = WeakClassifier.predict(
 					samples[i].getPattern()[weakClassifier.getFeatureIndex()],
 					weakClassifier.getThreshold(),
 					weakClassifier.getDirection(),
@@ -57,19 +57,19 @@ class StrongClassifier {
 				}
 			}
 
-			if (epsilon == 0) {
+			if (epsilon === 0) {
 				epsilon = 0.000000000000001;
 			}
 
-			if (epsilon == 1) {
+			if (epsilon === 1) {
 				epsilon = 0.999999999999999;
 			}
 
 			alfa = 0.5 * log((1 - epsilon) / epsilon);
 
-			strongClassifier.setWeakClassifier(weakClassifier);
-			strongClassifier.setAlfa(alfa);
-			classifiers[k] = strongClassifier;
+			strong.setWeakClassifier(weakClassifier);
+			strong.setAlfa(alfa);
+			classifiers[k] = strong;
 
 			for (let i = 0; i < size; i++) {
 				weightsSum += weights[i] * exp(-1 * alfa * samples[i].getAnswer() * predictions[i]);
@@ -85,7 +85,7 @@ class StrongClassifier {
 		return classifiers;
 	}
 
-	public static getPredict(pattern: Array<number>, classifiers: Array<StrongClassifier>): Answer {
+	public static predict(pattern: Array<number>, classifiers: Array<StrongClassifier>): Answer {
 		let weakClassifier: WeakClassifier;
 		let answer = 0;
 
@@ -94,7 +94,7 @@ class StrongClassifier {
 
 			answer +=
 				classifiers[k].getAlfa() *
-				WeakClassifier.getPredict(
+				WeakClassifier.predict(
 					pattern[weakClassifier.getFeatureIndex()],
 					weakClassifier.getThreshold(),
 					weakClassifier.getDirection(),

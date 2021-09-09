@@ -36,7 +36,7 @@ class WeakClassifier {
 		const length = samples[0].getPattern().length;
 		const features: Array<Feature> = [];
 		const error: Array<number> = [];
-		const weakClassifier = new WeakClassifier();
+		const weak = new WeakClassifier();
 		let threshold = 0;
 		let direction: Direction = null;
 		let minimalError = Number.POSITIVE_INFINITY;
@@ -64,24 +64,23 @@ class WeakClassifier {
 					error[j] = 0;
 
 					for (let k = 0; k < size; k++) {
-						error[j] +=
-							abs(features[k].answer - WeakClassifier.getPredict(features[k].value, threshold, direction)) / 2.0;
+						error[j] += abs(features[k].answer - WeakClassifier.predict(features[k].value, threshold, direction)) / 2.0;
 					}
 
 					if (error[j] < minimalError) {
 						minimalError = error[j];
-						weakClassifier.setFeatureIndex(j);
-						weakClassifier.setThreshold(threshold);
-						weakClassifier.setDirection(direction);
+						weak.setFeatureIndex(j);
+						weak.setThreshold(threshold);
+						weak.setDirection(direction);
 					}
 				}
 			}
 		}
 
-		return weakClassifier;
+		return weak;
 	}
 
-	public static getPredict(value: number, treshold: number, direction: Direction): Answer {
+	public static predict(value: number, treshold: number, direction: Direction): Answer {
 		if (direction > 0) {
 			if (value <= treshold) {
 				return Answer.POSITIVE;

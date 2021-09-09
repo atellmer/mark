@@ -1,6 +1,9 @@
 function detectIsFunction(x: unknown): x is Function {
 	return typeof x === 'function';
 }
+function detectIsUndefined(x: unknown): x is undefined {
+	return typeof x === 'undefined';
+}
 
 function groupBy<T>(elements: Array<T>, selector: (x: T) => string | number): Record<string, Array<T>> {
 	const map: Record<string, Array<T>> = {};
@@ -24,4 +27,12 @@ function createListFromMap<T = any>(map: Record<string, T> = {}): Array<T> {
 	return Object.keys(map).reduce((acc, key) => (acc.push(map[key]), acc), []);
 }
 
-export { detectIsFunction, groupBy, createListFromMap };
+function keysCount<T extends object>(value: T): number {
+	return Object.keys(value).length;
+}
+
+function firstTrueKey<T extends object>(value: T): string {
+	return Object.keys(value).find(x => value[x] === true);
+}
+
+export { detectIsFunction, detectIsUndefined, groupBy, createListFromMap, keysCount, firstTrueKey };
