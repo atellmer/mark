@@ -38,7 +38,10 @@ function init() {
 
 	//const model = adaboost({ samples: trainSamples, estimatorsNumber: 10 });
 	const model = adaboost({ trained });
+	const result = model.verasity(trainSamples, testSamples);
 	const predict = model.predict(testSamples[0].getPattern());
+
+	console.log('result', result);
 }
 
 init();

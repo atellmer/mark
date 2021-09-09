@@ -8,11 +8,11 @@ class StrongClassifier {
 	private weak: WeakClassifier;
 	private alfa: number;
 
-	public getWeakClassifier(): WeakClassifier {
+	public getWeak(): WeakClassifier {
 		return this.weak;
 	}
 
-	public setWeakClassifier(weak: WeakClassifier) {
+	public setWeak(weak: WeakClassifier) {
 		this.weak = weak;
 	}
 
@@ -67,7 +67,7 @@ class StrongClassifier {
 
 			alfa = 0.5 * log((1 - epsilon) / epsilon);
 
-			strong.setWeakClassifier(weak);
+			strong.setWeak(weak);
 			strong.setAlfa(alfa);
 			classifiers[k] = strong;
 
@@ -90,7 +90,7 @@ class StrongClassifier {
 		let answer = 0;
 
 		for (let k = 0; k < classifiers.length; k++) {
-			weak = classifiers[k].getWeakClassifier();
+			weak = classifiers[k].getWeak();
 			answer +=
 				classifiers[k].getAlfa() *
 				WeakClassifier.predict(pattern[weak.getFeatureIndex()], weak.getThreshold(), weak.getDirection());

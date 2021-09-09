@@ -1,5 +1,6 @@
 import { createListFromMap, detectIsUndefined, firstTrueKey } from '@utils/helpers';
 import { saveJsonToFile } from '@utils/file';
+import { fixed } from '@utils/math';
 import { Sample } from '../sample';
 import { StrongClassifier, StrongClassifierObject, WeakClassifier } from './';
 
@@ -77,7 +78,7 @@ function adaboost(options: AdaBoostOptions): TrainedModel {
 				weak.setThreshold(item.weak.threshold);
 
 				strong.setAlfa(item.alfa);
-				strong.setWeakClassifier(weak);
+				strong.setWeak(weak);
 
 				if (!classifiersMap[i]) {
 					classifiersMap[i] = [];
@@ -111,6 +112,34 @@ class TrainedModel {
 		saveJsonToFile(json, filename);
 	}
 
+	public verasity(trainSamples: Array<Sample>, testSamples: Array<Sample>) {
+		const train = {
+			correctPercent: 0,
+			incorectPercent: 0,
+			incorrectCount: 0,
+			total: trainSamples.length,
+		};
+		const test = {
+			correctPercent: 0,
+			incorectPercent: 0,
+			incorrectCount: 0,
+			total: testSamples.length,
+		};
+
+		train.incorrectCount = this.bench(trainSamples);
+		train.incorectPercent = fixed((train.incorrectCount / trainSamples.length) * 100);
+		train.correctPercent = fixed(100 - train.incorectPercent);
+
+		test.incorrectCount = this.bench(testSamples);
+		test.incorectPercent = fixed((test.incorrectCount / testSamples.length) * 100);
+		test.correctPercent = fixed(100 - test.incorectPercent);
+
+		return {
+			train,
+			test,
+		};
+	}
+
 	public predict(pattern: Array<number>) {
 		const map = {};
 
@@ -126,6 +155,22 @@ class TrainedModel {
 
 		return predict;
 	}
+
+	private bench = (samples: Array<Sample>) => {
+		let error = 0;
+
+		for (const sample of samples) {
+			const pattern = sample.getPattern();
+			const answer = sample.getAnswer();
+			const prediction = this.predict(pattern);
+
+			if (prediction !== answer) {
+				error++;
+			}
+		}
+
+		return error;
+	};
 }
 
 type RecoveryModel = {

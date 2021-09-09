@@ -36,4 +36,8 @@ function max(values: Array<number>): number {
 	return math.max(values);
 }
 
-export { mean, pow, sqrt, exp, random, abs, log, min, max };
+function fixed(x: number): number {
+	return Number(x.toFixed(2));
+}
+
+export { mean, pow, sqrt, exp, random, abs, log, min, max, fixed };
