@@ -10,4 +10,8 @@ const engine = adaboost({ inlineEngine: inlineIrisesEngine });
 
 engine.verasity(trainSamples, testSamples);
 
-pricesApi.fetchHistoricalPrices({ pair: 'BTC_USD', timeframe: 'D' });
+(async () => {
+	const prices = await pricesApi.fetchHistoricalPrices({ pair: 'BTC_USDT', timeframe: 'D' });
+
+	console.log('prices', prices);
+})();
