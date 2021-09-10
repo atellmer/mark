@@ -1,4 +1,3 @@
-export * from './ansible';
+export * from './ensemble';
 export * from './strategy';
-export * from './boosting-strategy';
 export * from './random-strategy';

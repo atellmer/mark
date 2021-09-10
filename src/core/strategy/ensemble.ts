@@ -1,6 +1,6 @@
 import { Strategy, TradingDecision, DecisionMaker, GetDecisionOptions } from './strategy';
 
-class StrategyAnsible implements DecisionMaker {
+class StrategyEnsemble implements DecisionMaker {
 	private startegies: Array<Strategy> = [];
 
 	constructor(startegies: Array<Strategy>) {
@@ -28,4 +28,4 @@ class StrategyAnsible implements DecisionMaker {
 	}
 }
 
-export { StrategyAnsible };
+export { StrategyEnsemble };
