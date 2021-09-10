@@ -1,3 +1,4 @@
+import { pricesApi } from '@core/api';
 import { Sample, adaboost } from '@core/ai';
 import irisesTrainDataset from '@core/ai/datasets/irises/train.csv';
 import irisesTestDataset from '@core/ai/datasets/irises/test.csv';
@@ -8,3 +9,5 @@ const testSamples = Sample.fromDataset(irisesTestDataset);
 const engine = adaboost({ inlineEngine: inlineIrisesEngine });
 
 engine.verasity(trainSamples, testSamples);
+
+pricesApi.fetchHistoricalPrices({ pair: 'BTC_USD', timeframe: 'D' });
