@@ -1,6 +1,6 @@
 import { max, fix } from '@utils/math';
 import { saveJsonToFile } from '@utils/file';
-import { Sample } from '@core/ai/sample';
+import { Sample, normalizePattern } from '@core/ai/sample';
 import { Label } from '@core/ai/adaboost/models';
 import { Estimator, InlineEstimator } from '@core/ai/adaboost/estimator';
 import { DecisionStump } from '@core/ai/adaboost/stump';
@@ -13,8 +13,10 @@ type AdaBoostOptions = {
 
 function adaboost(options: AdaBoostOptions) {
 	const { samples, estimatorsTotal, inlineEngine } = options;
+	if (inlineEngine) return recovery(inlineEngine);
+	const normalSamples = Sample.normalize(samples);
 
-	return inlineEngine ? recovery(inlineEngine) : train(samples, estimatorsTotal);
+	return train(normalSamples, estimatorsTotal);
 }
 
 function train(sourceSamples: Array<Sample>, estimatorsTotal: number): PredictionEngine {
@@ -101,12 +103,19 @@ class PredictionEngine {
 		this.estimatorsMap = estimatorsMap;
 	}
 
-	public predict(pattern: Array<number>) {
+	public predict(patterns: Array<Array<number>>): Array<number> {
+		const predictions: Array<number> = patterns.map(x => this.predictOne(x));
+
+		return predictions;
+	}
+
+	public predictOne(pattern: Array<number>) {
+		const normalPattern = normalizePattern(pattern);
 		const values: Array<number> = [];
 
 		for (const label of this.labels) {
 			const estimators = this.estimatorsMap[label];
-			const predict = Estimator.predict(pattern, estimators);
+			const predict = Estimator.predict(normalPattern, estimators);
 
 			values.push(predict);
 		}
@@ -128,8 +137,8 @@ class PredictionEngine {
 
 		console.log(`number of train samples: ${train.length}`);
 		console.log(`number of test samples: ${test.length}`);
-		console.log(`in sample error: ${trainError}%`);
-		console.log(`out of sample error: ${testError}%`);
+		console.log(`in sample error: ${trainError.toFixed(2)}%`);
+		console.log(`out of sample error: ${testError.toFixed(2)}%`);
 		console.log('-----');
 
 		return {
@@ -153,7 +162,7 @@ class PredictionEngine {
 		for (const sample of samples) {
 			const pattern = sample.getPattern();
 			const label = sample.getLabel();
-			const prediction = this.predict(pattern);
+			const [prediction] = this.predict([pattern]);
 
 			if (prediction !== label) {
 				error++;

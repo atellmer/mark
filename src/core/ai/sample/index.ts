@@ -42,38 +42,39 @@ class Sample {
 		return samples;
 	}
 
-	public static normalizeOne(sample: Sample): Sample {
-		const normalPattern: Array<number> = [];
-		const pattern = sample.getPattern();
-		const length = pattern.length;
-		const average = mean(pattern);
-		let stddev = 0.0;
-
-		for (const feature of pattern) {
-			stddev += pow(feature - average, 2);
-		}
-
-		stddev = sqrt(stddev / (length - 1));
-
-		for (let i = 0; i < length; i++) {
-			const x = (pattern[i] - average) / stddev;
-			const y = (exp(x) - exp(-1 * x)) / (exp(x) + exp(-1 * x));
-
-			normalPattern.push(y);
-		}
-
-		return new Sample(normalPattern, sample.getLabel());
-	}
-
 	public static normalize(samples: Array<Sample>): Array<Sample> {
 		const normalSamples: Array<Sample> = [];
 
 		for (const sample of samples) {
-			normalSamples.push(Sample.normalizeOne(sample));
+			const normalSample = new Sample(normalizePattern(sample.getPattern()), sample.getLabel());
+
+			normalSamples.push(normalSample);
 		}
 
 		return normalSamples;
 	}
 }
 
-export { Sample };
+function normalizePattern(pattern: Array<number>) {
+	const normalPattern: Array<number> = [];
+	const length = pattern.length;
+	const average = mean(pattern);
+	let stddev = 0.0;
+
+	for (const feature of pattern) {
+		stddev += pow(feature - average, 2);
+	}
+
+	stddev = sqrt(stddev / (length - 1));
+
+	for (let i = 0; i < length; i++) {
+		const x = (pattern[i] - average) / stddev;
+		const y = (exp(x) - exp(-1 * x)) / (exp(x) + exp(-1 * x));
+
+		normalPattern.push(y);
+	}
+
+	return normalPattern;
+}
+
+export { Sample, normalizePattern };
