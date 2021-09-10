@@ -1,7 +1,5 @@
-import * as mathjs from 'mathjs';
-
 function mean(values: Array<number>): number {
-	return mathjs.mean(values);
+	return values.reduce((acc, x) => ((acc += x), acc), 0) / values.length;
 }
 
 function pow(x: number, y: number): number {
@@ -16,8 +14,8 @@ function exp(x: number): number {
 	return Math.exp(x);
 }
 
-function random(min?: number, max?: number): number {
-	return mathjs.random(min, max);
+function random(min: number, max: number) {
+	return Math.random() * (max - min) + min;
 }
 
 function abs(x: number): number {
@@ -36,8 +34,8 @@ function max(values: Array<number>): number {
 	return Math.max(...values);
 }
 
-function fixed(x: number): number {
-	return Number(x.toFixed(2));
+function fix(x: number, precision = 4): number {
+	return Number(x.toFixed(precision));
 }
 
-export { mean, pow, sqrt, exp, random, abs, log, min, max, fixed };
+export { mean, pow, sqrt, exp, random, abs, log, min, max, fix };

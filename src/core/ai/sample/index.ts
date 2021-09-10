@@ -1,53 +1,28 @@
 import { mean, pow, sqrt, exp } from '@utils/math';
 
 class Sample {
-	private pattern: Array<number>;
-	private answer: number;
+	private pattern: Array<number> = [];
+	private label: number;
 
 	constructor(pattern: Array<number>, answer: number) {
 		this.pattern = pattern;
-		this.answer = answer;
+		this.label = answer;
 	}
 
 	public getPattern(): Array<number> {
 		return this.pattern;
 	}
 
-	public getAnswer(): number {
-		return this.answer;
+	public getLabel(): number {
+		return this.label;
 	}
 
-	public static normalizeOne(sample: Sample): Sample {
-		const pattern = sample.getPattern();
-		const patternNormalized = [];
-		const count = pattern.length;
-		const average = mean(pattern);
-		let stdDev = 0.0;
-
-		for (const feature of pattern) {
-			stdDev += pow(feature - average, 2);
-		}
-
-		stdDev = sqrt(stdDev / (count - 1));
-
-		for (let i = 0; i < count; i++) {
-			patternNormalized[i] = (pattern[i] - average) / stdDev;
-			patternNormalized[i] =
-				(exp(patternNormalized[i]) - exp(-1 * patternNormalized[i])) /
-				(exp(patternNormalized[i]) + exp(-1 * patternNormalized[i]));
-		}
-
-		return new Sample(patternNormalized, sample.getAnswer());
+	public getLength(): number {
+		return this.pattern.length;
 	}
 
-	public static normalize(samples: Array<Sample>): Array<Sample> {
-		const normalized: Array<Sample> = [];
-
-		for (const sample of samples) {
-			normalized.push(Sample.normalizeOne(sample));
-		}
-
-		return normalized;
+	public getFeatureValue(idx: number): number {
+		return this.pattern[idx];
 	}
 
 	public static fromDataset(dataset: Array<Array<number>>): Array<Sample> {
@@ -65,6 +40,39 @@ class Sample {
 		}
 
 		return samples;
+	}
+
+	public static normalizeOne(sample: Sample): Sample {
+		const normalPattern: Array<number> = [];
+		const pattern = sample.getPattern();
+		const length = pattern.length;
+		const average = mean(pattern);
+		let stddev = 0.0;
+
+		for (const feature of pattern) {
+			stddev += pow(feature - average, 2);
+		}
+
+		stddev = sqrt(stddev / (length - 1));
+
+		for (let i = 0; i < length; i++) {
+			const x = (pattern[i] - average) / stddev;
+			const y = (exp(x) - exp(-1 * x)) / (exp(x) + exp(-1 * x));
+
+			normalPattern.push(y);
+		}
+
+		return new Sample(normalPattern, sample.getLabel());
+	}
+
+	public static normalize(samples: Array<Sample>): Array<Sample> {
+		const normalSamples: Array<Sample> = [];
+
+		for (const sample of samples) {
+			normalSamples.push(Sample.normalizeOne(sample));
+		}
+
+		return normalSamples;
 	}
 }
 
