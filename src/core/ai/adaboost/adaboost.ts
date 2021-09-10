@@ -73,15 +73,9 @@ const recovery = (engine: InlinePredictionEngine): PredictionEngine => {
 
 		for (let j = 0; j < inlineEstimators.length; j++) {
 			const inlineEstimator = inlineEstimators[j];
-			const estimator = new Estimator();
-			const stump = new DecisionStump();
-
-			stump.setFeatureIdx(inlineEstimator.stump.featureIdx);
-			stump.setThreshold(inlineEstimator.stump.threshold);
-			stump.setDirection(inlineEstimator.stump.direction);
-
-			estimator.setAlfa(inlineEstimator.alfa);
-			estimator.setStump(stump);
+			const { featureIdx, threshold, direction } = inlineEstimator.stump;
+			const stump = new DecisionStump(featureIdx, threshold, direction);
+			const estimator = new Estimator(inlineEstimator.alfa, stump);
 
 			if (!estimatorsMap[label]) {
 				estimatorsMap[label] = [];

@@ -5,6 +5,6 @@ import inlineIrisesEngine from '@core/ai/adaboost/trained/irises-model.json';
 
 const trainSamples = Sample.fromDataset(irisesTrainDataset);
 const testSamples = Sample.fromDataset(irisesTestDataset);
-const engine = adaboost({ samples: trainSamples, estimatorsTotal: 100 });
+const engine = adaboost({ inlineEngine: inlineIrisesEngine });
 
 engine.verasity(trainSamples, testSamples);

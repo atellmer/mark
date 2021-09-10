@@ -7,6 +7,11 @@ class Estimator {
 	private alfa: number;
 	private stump: DecisionStump;
 
+	constructor(alfa?: number, stump?: DecisionStump) {
+		this.alfa = alfa;
+		this.stump = stump;
+	}
+
 	public getAlfa(): number {
 		return this.alfa;
 	}

@@ -3,9 +3,15 @@ import { Sample } from '@core/ai/sample';
 import { Direction, Label } from '@core/ai/adaboost/models';
 
 class DecisionStump {
-	private featureIdx = 0;
-	private threshold = 0;
-	private direction: Direction = Direction.UP;
+	private featureIdx: number;
+	private threshold: number;
+	private direction: Direction;
+
+	constructor(featureIdx?: number, threshold?: number, direction?: Direction) {
+		this.featureIdx = featureIdx || 0;
+		this.threshold = threshold || 0;
+		this.direction = direction || Direction.UP;
+	}
 
 	public getFeatureIdx(): number {
 		return this.featureIdx;
