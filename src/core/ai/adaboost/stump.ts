@@ -6,8 +6,6 @@ class DecisionStump {
 	private featureIdx = 0;
 	private threshold = 0;
 	private direction: Direction = Direction.UP;
-	private min = 0;
-	private max = 0;
 
 	public getFeatureIdx(): number {
 		return this.featureIdx;
@@ -31,11 +29,6 @@ class DecisionStump {
 
 	public setDirection(direction: Direction) {
 		this.direction = direction;
-	}
-
-	public setMinMax(min: number, max: number) {
-		this.min = min;
-		this.max = max;
 	}
 
 	public predict(options: DecisionStumpPredictOptions): Label {
@@ -91,7 +84,6 @@ class DecisionStump {
 					stump.setFeatureIdx(featureIdx);
 					stump.setThreshold(threshold);
 					stump.setDirection(direction);
-					stump.setMinMax(value, nextValue);
 				}
 
 				if (minimalError === 0) break;
@@ -125,5 +117,11 @@ class Feature {
 		return this.label;
 	}
 }
+
+export type InlineDecisionStump = {
+	featureIdx: number;
+	threshold: number;
+	direction: number;
+};
 
 export { DecisionStump };

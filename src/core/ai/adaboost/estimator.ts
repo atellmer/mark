@@ -1,6 +1,6 @@
 import { log, exp, random } from '@utils/math';
 import { Sample } from '@core/ai/sample';
-import { DecisionStump } from '@core/ai/adaboost/stump';
+import { DecisionStump, InlineDecisionStump } from '@core/ai/adaboost/stump';
 import { Label } from '@core/ai/adaboost/models';
 
 class Estimator {
@@ -198,5 +198,10 @@ class Weight {
 		this.idx = idx;
 	}
 }
+
+export type InlineEstimator = {
+	alfa: number;
+	stump: InlineDecisionStump;
+};
 
 export { Estimator };

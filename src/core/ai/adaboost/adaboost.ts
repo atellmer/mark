@@ -1,10 +1,20 @@
 import { max, fix } from '@utils/math';
+import { saveJsonToFile } from '@utils/file';
 import { Sample } from '@core/ai/sample';
 import { Label } from '@core/ai/adaboost/models';
-import { Estimator } from '@core/ai/adaboost/estimator';
+import { Estimator, InlineEstimator } from '@core/ai/adaboost/estimator';
+import { DecisionStump } from '@core/ai/adaboost/stump';
 
-function adaboost(samples: Array<Sample>, estimatorsTotal: number) {
-	return train(samples, estimatorsTotal);
+type AdaBoostOptions = {
+	samples?: Array<Sample>;
+	estimatorsTotal?: number;
+	inlineEngine?: InlinePredictionEngine;
+};
+
+function adaboost(options: AdaBoostOptions) {
+	const { samples, estimatorsTotal, inlineEngine } = options;
+
+	return inlineEngine ? recovery(inlineEngine) : train(samples, estimatorsTotal);
 }
 
 function train(sourceSamples: Array<Sample>, estimatorsTotal: number): PredictionEngine {
@@ -52,6 +62,36 @@ function prepareSamples(samples: Array<Sample>, sourceLabel: number): Array<Samp
 	return items;
 }
 
+const recovery = (engine: InlinePredictionEngine): PredictionEngine => {
+	const labels = engine.labels;
+	const estimatorsMap: Record<number, Array<Estimator>> = {};
+
+	for (const label of labels) {
+		const inlineEstimators = engine.estimatorsMap[label];
+
+		for (let j = 0; j < inlineEstimators.length; j++) {
+			const inlineEstimator = inlineEstimators[j];
+			const estimator = new Estimator();
+			const stump = new DecisionStump();
+
+			stump.setFeatureIdx(inlineEstimator.stump.featureIdx);
+			stump.setThreshold(inlineEstimator.stump.threshold);
+			stump.setDirection(inlineEstimator.stump.direction);
+
+			estimator.setAlfa(inlineEstimator.alfa);
+			estimator.setStump(stump);
+
+			if (!estimatorsMap[label]) {
+				estimatorsMap[label] = [];
+			}
+
+			estimatorsMap[label].push(estimator);
+		}
+	}
+
+	return new PredictionEngine(labels, estimatorsMap);
+};
+
 class PredictionEngine {
 	private labels: Array<number> = [];
 	private estimatorsMap: Record<number, Array<Estimator>> = {};
@@ -98,6 +138,15 @@ class PredictionEngine {
 		};
 	}
 
+	public toJSON(filename: string) {
+		const json = JSON.stringify({
+			labels: this.labels,
+			estimatorsMap: this.estimatorsMap,
+		});
+
+		saveJsonToFile(json, filename);
+	}
+
 	private bench = (samples: Array<Sample>) => {
 		let error = 0;
 
@@ -114,5 +163,10 @@ class PredictionEngine {
 		return error;
 	};
 }
+
+type InlinePredictionEngine = {
+	labels: Array<number>;
+	estimatorsMap: Record<number, Array<InlineEstimator>>;
+};
 
 export { adaboost };
