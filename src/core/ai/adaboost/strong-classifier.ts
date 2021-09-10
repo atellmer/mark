@@ -29,10 +29,7 @@ class StrongClassifier {
 		const weights: Array<number> = [];
 		const predictions: Array<Answer> = [];
 		const classifiers: Array<StrongClassifier> = [];
-		let selectedSamples = [...samples];
-		let weightsSum = 0;
-		let epsilon = 0;
-		let alfa = 0;
+		let selectedSamples = samples;
 
 		for (let i = 0; i < size; i++) {
 			weights[i] = 1 / size;
@@ -41,10 +38,12 @@ class StrongClassifier {
 		for (let k = 0; k < estimatorsNumber; k++) {
 			const weak = WeakClassifier.train(selectedSamples);
 			const strong = new StrongClassifier();
+			let weightsSum = 0;
+			let epsilon = 0;
+			let alfa = 0;
 
-			epsilon = 0;
-			weightsSum = 0;
-			alfa = 0;
+			console.log('k', k)
+			console.log('weights', weights)
 
 			for (let i = 0; i < size; i++) {
 				const pattern = samples[i].getPattern();
@@ -73,11 +72,17 @@ class StrongClassifier {
 			classifiers[k] = strong;
 
 			for (let i = 0; i < size; i++) {
-				weightsSum += weights[i] * exp(-1 * alfa * samples[i].getAnswer() * predictions[i]);
+				const answer = samples[i].getAnswer();
+				const prediction = predictions[i];
+
+				weightsSum += weights[i] * exp(-1 * alfa * answer * prediction);
 			}
 
 			for (let i = 0; i < size; i++) {
-				weights[i] = (weights[i] * exp(-1 * alfa * samples[i].getAnswer() * predictions[i])) / weightsSum;
+				const answer = samples[i].getAnswer();
+				const prediction = predictions[i];
+
+				weights[i] = (weights[i] * exp(-1 * alfa * answer * prediction)) / weightsSum;
 			}
 
 			selectedSamples = ProbabilitySelector.select(weights, selectedSamples);

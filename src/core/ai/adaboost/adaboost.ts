@@ -58,6 +58,8 @@ function adaboost(options: AdaBoostOptions): TrainedModel {
 			map[i] = classifiers;
 		}
 
+		//console.log('map', map)
+
 		return new TrainedModel(labels, map);
 	};
 

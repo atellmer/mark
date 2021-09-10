@@ -1,4 +1,4 @@
-import { random, min } from '@utils/math';
+import { random } from '@utils/math';
 import { Sample } from '../sample';
 import { Answer } from './models';
 
@@ -26,22 +26,22 @@ class ProbabilitySelector {
 
 		const wheel = ProbabilitySelector.whell(size, weights);
 
-		while (selectedSamples.length < wheel.length) {
-			const minSize = min(wheel);
-			const rnd = ProbabilitySelector.random(minSize);
+		while (selectedSamples.length < samples.length) {
+			const rnd = random(0, 100);
 
 			for (let i = 0; i < wheel.length - 1; i++) {
-				if (rnd > wheel[i] && rnd <= wheel[i + 1]) {
-					const sample = samples[weights[i + 1].index];
-					const answer = sample.getAnswer();
+				if (rnd <= wheel[i] || rnd > wheel[i + 1]) {
+					continue;
+				}
+				const sample = samples[weights[i + 1].index];
+				const answer = sample.getAnswer();
 
-					if (answer === Answer.POSITIVE && selectedPositiveAnswersCount < positiveAnswersCount) {
-						selectedSamples.push(sample);
-						selectedPositiveAnswersCount++;
-					} else if (answer === Answer.NEGATIVE && selectedNegativeAnswersCount < negativeAnswersCount) {
-						selectedSamples.push(sample);
-						selectedNegativeAnswersCount++;
-					}
+				if (answer === Answer.POSITIVE && selectedPositiveAnswersCount < positiveAnswersCount) {
+					selectedSamples.push(sample);
+					selectedPositiveAnswersCount++;
+				} else if (answer === Answer.NEGATIVE && selectedNegativeAnswersCount < negativeAnswersCount) {
+					selectedSamples.push(sample);
+					selectedNegativeAnswersCount++;
 				}
 			}
 		}
@@ -66,42 +66,6 @@ class ProbabilitySelector {
 		}
 
 		return wheel;
-	}
-
-	private static random(minSize: number): number {
-		if (minSize >= 1) {
-			return random(0, 100);
-		}
-
-		if (minSize < 1 && minSize >= 0.1) {
-			return random(0, 1000) * 0.1;
-		}
-
-		if (minSize < 0.1 && minSize >= 0.01) {
-			return random(0, 10000) * 0.01;
-		}
-
-		if (minSize < 0.01 && minSize >= 0.001) {
-			return random(0, 100000) * 0.001;
-		}
-
-		if (minSize < 0.001 && minSize >= 0.0001) {
-			return random(0, 1000000) * 0.0001;
-		}
-
-		if (minSize < 0.0001 && minSize >= 0.00001) {
-			return random(0, 10000000) * 0.00001;
-		}
-
-		if (minSize < 0.00001 && minSize >= 0.000001) {
-			return random(0, 100000000) * 0.000001;
-		}
-
-		if (minSize < 0.000001) {
-			return random(0, 1000000000) * 0.0000001;
-		}
-
-		return 0.0;
 	}
 }
 

@@ -35,9 +35,9 @@ class WeakClassifier {
 		const size = samples.length;
 		const patternLength = samples[0].getPattern().length;
 		const features: Array<Feature> = [];
-		const error: Array<number> = [];
 		const weak = new WeakClassifier();
 		let minimalError = Number.POSITIVE_INFINITY;
+		let error = 0;
 
 		for (let j = 0; j < patternLength; j++) {
 			const featureIndex = j;
@@ -64,20 +64,24 @@ class WeakClassifier {
 				const threshold = (currentValue + siblingValue) / 2.0;
 				const direction: Direction = currentAnswer === Answer.POSITIVE ? Direction.UP : Direction.DOWN;
 
-				error[j] = 0.0;
+				error = 0.0;
 
 				for (let k = 0; k < size; k++) {
 					const featureValue = features[k].value;
 
-					error[j] += abs(features[k].answer - weak.predict(featureValue, threshold, direction)) / 2.0;
+					error += abs(features[k].answer - weak.predict(featureValue, threshold, direction)) / 2.0;
 				}
 
-				if (error[j] < minimalError) {
-					minimalError = error[j];
+				if (error < minimalError) {
+					minimalError = error;
 
 					weak.setFeatureIndex(featureIndex);
 					weak.setThreshold(threshold);
 					weak.setDirection(direction);
+				}
+
+				if (minimalError === 0) {
+					break;
 				}
 			}
 		}
@@ -87,18 +91,10 @@ class WeakClassifier {
 
 	public predict(featureValue: number, threshold = this.threshold, direction: Direction = this.direction): Answer {
 		if (direction === Direction.UP) {
-			if (featureValue <= threshold) {
-				return Answer.POSITIVE;
-			}
-
-			return Answer.NEGATIVE;
+			return featureValue <= threshold ? Answer.POSITIVE : Answer.NEGATIVE;
 		}
 
-		if (featureValue <= threshold) {
-			return Answer.NEGATIVE;
-		}
-
-		return Answer.POSITIVE;
+		return featureValue <= threshold ? Answer.NEGATIVE : Answer.POSITIVE;
 	}
 }
 
