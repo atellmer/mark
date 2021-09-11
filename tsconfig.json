@@ -26,9 +26,6 @@
 			],
 			"@utils/*": [
 				"./src/utils/*"
-			],
-			"@datasets/*": [
-				"./src/datasets/*"
 			]
 		}
 	},

@@ -1,12 +1,10 @@
-import { pricesApi } from '@core/api';
-import { Price } from '@core/market';
-import pricedataset from '@datasets/price/btc_usdt_d.json';
-
+import { Bar } from '@core/trading/primitives';
+import { TradingTester } from '@core/trading/tester';
+import pricesdataset from '@core/datasets/bars/btc_usdt_d.json';
 
 (async () => {
-	//const prices = await pricesApi.fetchHistoricalPrices({ pair: 'BTC_USDT', timeframe: 'D', limit: 2000 });
+	const bars = Bar.fromJSON(pricesdataset);
+	const tester = new TradingTester({ initialBalance: 1000, bars, pair: 'btc_usdt' });
 
-	const prices = Price.fromJSON(pricedataset);
-
-	console.log('prices', prices)
+	await tester.run();
 })();

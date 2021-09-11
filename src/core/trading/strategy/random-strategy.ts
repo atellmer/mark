@@ -3,7 +3,7 @@ import { Strategy, GetDecisionOptions, TradingDecision } from './strategy';
 
 class RandomStrategy extends Strategy {
 	public getDecision(options: GetDecisionOptions) {
-		const { price } = options;
+		const { tick } = options;
 
 		return new Promise<TradingDecision>(resolve => {
 			const rand = random(0, 1);

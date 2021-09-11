@@ -1,5 +1,3 @@
-import { Price } from '../market';
-
 export interface DecisionMaker {
 	getDecision: (options: GetDecisionOptions) => Promise<TradingDecision>;
 }
@@ -9,7 +7,7 @@ abstract class Strategy implements DecisionMaker {
 }
 
 export type GetDecisionOptions = {
-	price: Price;
+	tick: number;
 };
 
 export enum TradingDecision {

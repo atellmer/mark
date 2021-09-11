@@ -1,15 +1,15 @@
 import { Strategy, TradingDecision, DecisionMaker, GetDecisionOptions } from './strategy';
 
 class StrategyEnsemble implements DecisionMaker {
-	private startegies: Array<Strategy> = [];
+	private strategies: Array<Strategy> = [];
 
 	constructor(startegies: Array<Strategy>) {
-		this.startegies = startegies;
+		this.strategies = startegies;
 	}
 
 	getDecision(options: GetDecisionOptions): Promise<TradingDecision> {
 		return new Promise<TradingDecision>(async resolve => {
-			const decisions = await Promise.all(this.startegies.map(x => x.getDecision(options)));
+			const decisions = await Promise.all(this.strategies.map(x => x.getDecision(options)));
 			const buyWeight = decisions.filter(x => x === TradingDecision.BUY).length;
 			const sellWeight = decisions.filter(x => x === TradingDecision.SELL).length;
 			const keepWeight = decisions.filter(x => x === TradingDecision.KEEP).length;
