@@ -1,17 +1,12 @@
 import { pricesApi } from '@core/api';
-import { Sample, adaboost } from '@core/ai';
-import irisesTrainDataset from '@core/ai/datasets/irises/train.csv';
-import irisesTestDataset from '@core/ai/datasets/irises/test.csv';
-import inlineIrisesEngine from '@core/ai/adaboost/trained/irises-model.json';
+import { Price } from '@core/market';
+import pricedataset from '@datasets/price/btc_usdt_d.json';
 
-const trainSamples = Sample.fromDataset(irisesTrainDataset);
-const testSamples = Sample.fromDataset(irisesTestDataset);
-const engine = adaboost({ inlineEngine: inlineIrisesEngine });
-
-engine.verasity(trainSamples, testSamples);
 
 (async () => {
-	const prices = await pricesApi.fetchHistoricalPrices({ pair: 'BTC_USDT', timeframe: 'D' });
+	//const prices = await pricesApi.fetchHistoricalPrices({ pair: 'BTC_USDT', timeframe: 'D', limit: 2000 });
 
-	console.log('prices', prices);
+	const prices = Price.fromJSON(pricedataset);
+
+	console.log('prices', prices)
 })();

@@ -1,9 +1,9 @@
-import * as moment from 'moment';
+import moment from 'moment';
 
-const BASE_DATE_FORMAT = 'DD-MM-YYYY';
+const BASE_TIME_FORMAT = 'DD-MM-YYYY hh:mm:ss';
 
-function prettyDate(date: string) {
-	return moment(date, BASE_DATE_FORMAT).format('DD.MM.YYYY');
+function convertUnixTimestampToDate(unixTimestamp: number) {
+	return moment(new Date(unixTimestamp * 1000)).format(BASE_TIME_FORMAT);
 }
 
-export { BASE_DATE_FORMAT, prettyDate };
+export { convertUnixTimestampToDate };
