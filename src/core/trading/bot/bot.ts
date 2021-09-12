@@ -21,7 +21,6 @@ class TradingBot implements MarketSubscriber {
 		this.ensemble = ensemble;
 		this.manager = manager;
 		this.trader = trader;
-		this.manager.setTicker(ticker);
 	}
 
 	public subscribe(subscriber: Subscriber) {

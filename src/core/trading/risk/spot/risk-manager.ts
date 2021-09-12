@@ -1,91 +1,47 @@
 import { Deal } from '@core/trading/primitives';
 import { TradingDecision } from '@core/trading/strategy';
 
-type SpotRiskManagerConstructor = {
+export type SpotRiskManagerConstructor = {
 	style: RiskStyle;
-	balance: number;
-	commision: number;
+	comission: number;
 };
 
 abstract class SpotRiskManager {
-	private ticker: string;
-	private style: RiskStyle;
-	private balance = 0;
-	private quantityOnBalance = 0;
-	private commision = 0;
+	protected ticker: string;
+	protected style: RiskStyle;
+	protected basisAssetBalance = 0;
+	protected targetAssetBalance = 0;
+	protected comission = 0;
 
 	constructor(options: SpotRiskManagerConstructor) {
-		const { style, balance, commision } = options;
+		const { style, comission } = options;
 
 		this.style = style;
-		this.balance = balance;
-		this.commision = commision;
+		this.comission = comission;
 	}
+
+	public abstract getCurrentBasisAssetBalance(price: number): Promise<number>;
 
 	public abstract calculateRiskParameters(options: CalculateRiskParametersOptions): Promise<RiskParameters>;
 
 	public abstract onDeal(deal: Deal): void;
 
-	public getTicker(): string {
-		return this.ticker;
-	}
-
-	public setTicker(ticker: string) {
-		this.ticker = ticker;
-	}
-
-	public getBalance(): number {
-		return this.balance;
-	}
-
-	public setBalance(balance: number) {
-		this.balance = balance;
-	}
-
-	public getStyle(): RiskStyle {
-		return this.style;
-	}
-
-	public setStyle(style: RiskStyle) {
-		this.style = style;
-	}
-
-	public getQuantityOnBalance(): number {
-		return this.quantityOnBalance;
-	}
-
-	public setQuantityOnBalance(quantityOnBalance: number) {
-		this.quantityOnBalance = quantityOnBalance;
-	}
-
-	public getCommision(): number {
-		return this.commision;
-	}
-
-	public setCommision(commision: number) {
-		this.balance = commision;
-	}
-
-	public getCurrentBalance(price: number): number {
-		return this.balance + this.quantityOnBalance * price;
-	}
-
 	public static getRiskParameters(options: GetRiskParametersOptions): RiskParameters {
-		const { style, balance, commision, price, decision, quantityOnBalance } = options;
+		const { style, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
 		const quantity = SpotRiskManager.getTradeQuantity({
 			style,
-			balance,
+			basisAssetBalance,
+			targetAssetBalance,
 			price,
+			comission,
 			decision,
-			quantityOnBalance,
 		});
 		const canTakeRisk = SpotRiskManager.detectIsTradeAvailable({
-			balance,
-			commision,
+			basisAssetBalance,
+			targetAssetBalance,
 			price,
 			quantity,
 			decision,
-			quantityOnBalance,
 		});
 		const { stoploss, takeprofit } = SpotRiskManager.getTradeBoundaries({ style, price, decision });
 		const risk: RiskParameters = {
@@ -99,29 +55,25 @@ abstract class SpotRiskManager {
 	}
 
 	public static detectIsTradeAvailable(options: DetectIsTradeAvailabelOptions): boolean {
-		const { balance, commision, price, quantity, decision, quantityOnBalance } = options;
+		const { basisAssetBalance, targetAssetBalance, price, quantity, decision } = options;
 		const isBuy = decision === TradingDecision.BUY;
 		const isSell = decision === TradingDecision.SELL;
-		const isAvailable = isBuy
-			? balance >= price * quantity + commision
-			: isSell
-			? quantityOnBalance >= quantity
-			: false;
+		const isAvailable = isBuy ? basisAssetBalance >= price * quantity : isSell ? targetAssetBalance >= quantity : false;
 
 		return isAvailable;
 	}
 
 	public static getTradeQuantity(options: GetQuantityOptions): number {
-		const { style, quantityOnBalance, price, balance, decision } = options;
+		const { style, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
 		const percentsMap = {
 			[RiskStyle.AGGRESIVE]: 0.2,
 			[RiskStyle.CONSERVATIVE]: 0.1,
 		};
 		const percent = percentsMap[style];
-		const quantity = (balance * percent) / price;
+		const quantity = (basisAssetBalance * percent) / (price + comission);
 
-		if (decision === TradingDecision.SELL && quantityOnBalance > 0 && quantityOnBalance < quantity) {
-			return quantityOnBalance;
+		if (decision === TradingDecision.SELL && targetAssetBalance > 0 && targetAssetBalance < quantity) {
+			return targetAssetBalance;
 		}
 
 		return quantity;
@@ -157,17 +109,16 @@ export type CalculateRiskParametersOptions = {
 
 type GetRiskParametersOptions = {
 	style: RiskStyle;
-	balance: number;
-	commision: number;
-	quantityOnBalance: number;
+	basisAssetBalance: number;
+	targetAssetBalance: number;
 	price: number;
+	comission: number;
 	decision: TradingDecision;
 };
 
 type DetectIsTradeAvailabelOptions = {
-	balance: number;
-	commision: number;
-	quantityOnBalance: number;
+	basisAssetBalance: number;
+	targetAssetBalance: number;
 	price: number;
 	quantity: number;
 	decision: TradingDecision;
@@ -193,9 +144,10 @@ type GetTradeBoundariesOptions = {
 
 type GetQuantityOptions = {
 	style: RiskStyle;
-	balance: number;
+	basisAssetBalance: number;
+	targetAssetBalance: number;
 	price: number;
-	quantityOnBalance: number;
+	comission: number;
 	decision: TradingDecision;
 };
 
