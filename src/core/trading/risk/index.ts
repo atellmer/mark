@@ -1,3 +1,3 @@
-export * from './risk-manager';
-export * from './exchange-risk-manager';
-export * from './test-risk-manager';
+export * from './spot/risk-manager';
+export * from './spot/exchange-risk-manager';
+export * from './spot/test-risk-manager';

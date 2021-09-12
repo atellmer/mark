@@ -6,10 +6,10 @@ class TestTrader extends Trader {
 		return new Promise<Deal>(resolve => {
 			const pair = order.getPair();
 			const direction = order.getDirection();
-			const tick = order.getTick();
-			const amount = order.getAmount();
+			const price = order.getPrice();
+			const quantity = order.getQuantity();
 			const timestamp = order.getTimestamp();
-			const deal = new Deal({ pair, direction, tick, amount, timestamp });
+			const deal = new Deal({ pair, direction, price, quantity, timestamp });
 
 			resolve(deal);
 		});

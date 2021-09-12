@@ -1,7 +1,7 @@
 import { Bar, Deal } from '@core/trading/primitives';
 import { TestMarket } from '@core/trading/market';
 import { TradingDecision, StrategyEnsemble, RandomStrategy } from '@core/trading/strategy';
-import { TestRiskManager, RiskStyle } from '@core/trading/risk';
+import { TestSpotRiskManager, RiskStyle } from '@core/trading/risk';
 import { TestTrader } from '@core/trading/trader';
 import { TradingBot } from '@core/trading/bot';
 
@@ -28,7 +28,11 @@ class TradingTester {
 			const initialBalance = this.initialBalance;
 			const market = new TestMarket(pair, bars);
 			const ensemble = new StrategyEnsemble([new RandomStrategy()]);
-			const manager = new TestRiskManager({ riskStyle: RiskStyle.CONSERVATIVE, initialBalance });
+			const manager = new TestSpotRiskManager({
+				style: RiskStyle.CONSERVATIVE,
+				balance: initialBalance,
+				commision: 0.1,
+			});
 			const trader = new TestTrader();
 			const bot = new TradingBot(pair, ensemble, manager, trader);
 

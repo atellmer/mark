@@ -2,22 +2,22 @@ class Order {
 	private pair: string;
 	private direction: OrderDirection;
 	private type: OrderType;
-	private tick: number;
-	private stopLoss: number;
-	private takeProfit: number;
-	private amount: number;
+	private price: number;
+	private quantity: number;
+	private stoploss: number;
+	private takeprofit: number;
 	private timestamp: number;
 
 	constructor(options: OrderOptions) {
-		const { pair, direction, type, tick, stopLoss, takeProfit, amount, timestamp } = options;
+		const { pair, direction, type, price, quantity, stoploss, takeprofit, timestamp } = options;
 
 		this.pair = pair;
 		this.direction = direction;
 		this.type = type;
-		this.tick = tick;
-		this.stopLoss = stopLoss;
-		this.takeProfit = takeProfit;
-		this.amount = amount;
+		this.price = price;
+		this.quantity = quantity;
+		this.stoploss = stoploss;
+		this.takeprofit = takeprofit;
 		this.timestamp = timestamp;
 	}
 
@@ -33,20 +33,20 @@ class Order {
 		return this.type;
 	}
 
-	public getTick(): number {
-		return this.tick;
+	public getPrice(): number {
+		return this.price;
 	}
 
-	public getStopLoss(): number {
-		return this.stopLoss;
+	public getQuantity(): number {
+		return this.quantity;
 	}
 
-	public getTakeProfit(): number {
-		return this.takeProfit;
+	public getStoploss(): number {
+		return this.stoploss;
 	}
 
-	public getAmount(): number {
-		return this.amount;
+	public getTakeprofit(): number {
+		return this.takeprofit;
 	}
 
 	public getTimestamp(): number {
@@ -66,13 +66,13 @@ export enum OrderDirection {
 
 type OrderOptions = {
 	pair: string;
-	timestamp: number;
-	tick: number;
-	stopLoss: number;
-	takeProfit: number;
-	type: OrderType;
 	direction: OrderDirection;
-	amount: number;
+	type: OrderType;
+	price: number;
+	quantity: number;
+	stoploss: number;
+	takeprofit: number;
+	timestamp: number;
 };
 
 export { Order };

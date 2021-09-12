@@ -1,23 +1,32 @@
-import { convertUnixTimeToTime } from '@utils/date';
 import { OrderDirection } from './order';
 
 class Deal {
+	private ID: number;
 	private pair: string;
 	private direction: OrderDirection;
-	private tick: number;
-	private amount: number;
+	private price: number;
+	private quantity: number;
 	private timestamp: number;
-	private time: string;
 
 	constructor(options: DealOptions) {
-		const { pair, direction, tick, amount, timestamp } = options;
+		const { pair, direction, price, quantity, timestamp } = options;
 
+		this.ID = Deal.getNextID();
 		this.pair = pair;
 		this.direction = direction;
-		this.tick = tick;
-		this.amount = amount;
+		this.price = price;
+		this.quantity = quantity;
 		this.timestamp = timestamp;
-		this.time = convertUnixTimeToTime(timestamp);
+	}
+
+	static nextID = 0;
+
+	private static getNextID() {
+		return ++Deal.nextID;
+	}
+
+	public getID(): number {
+		return this.ID;
 	}
 
 	public getPair(): string {
@@ -28,28 +37,24 @@ class Deal {
 		return this.direction;
 	}
 
-	public getTick(): number {
-		return this.tick;
+	public getPrice(): number {
+		return this.price;
 	}
 
-	public getAmount(): number {
-		return this.amount;
+	public getQuantity(): number {
+		return this.quantity;
 	}
 
 	public getTimestamp(): number {
 		return this.timestamp;
-	}
-
-	public getTimes(): string {
-		return this.time;
 	}
 }
 
 type DealOptions = {
 	pair: string;
 	direction: OrderDirection;
-	tick: number;
-	amount: number;
+	price: number;
+	quantity: number;
 	timestamp: number;
 };
 
