@@ -1,6 +1,15 @@
 import { convertUnixTimeToTime } from '@utils/date';
 import { saveJsonToFile } from '@utils/file';
 
+type BarConstructor = {
+	timestamp: number;
+	open: number;
+	low: number;
+	hight: number;
+	close: number;
+	volume: number;
+};
+
 class Bar {
 	private timestamp: number;
 	private time: string;
@@ -10,7 +19,7 @@ class Bar {
 	private close: number;
 	private volume: number;
 
-	constructor(options: BarOptions) {
+	constructor(options: BarConstructor) {
 		const { timestamp, open, low, hight, close, volume } = options;
 
 		this.timestamp = timestamp;
@@ -76,16 +85,7 @@ class Bar {
 	}
 }
 
-type BarOptions = {
-	timestamp: number;
-	open: number;
-	low: number;
-	hight: number;
-	close: number;
-	volume: number;
-};
-
-export type InlineBar = BarOptions & {
+export type InlineBar = BarConstructor & {
 	time: string;
 };
 

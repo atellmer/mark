@@ -1,17 +1,28 @@
 import { OrderDirection } from './order';
 
+type DealConstructor = {
+	ticker: string;
+	pair: string;
+	direction: OrderDirection;
+	price: number;
+	quantity: number;
+	timestamp: number;
+};
+
 class Deal {
 	private ID: number;
+	private ticker: string;
 	private pair: string;
 	private direction: OrderDirection;
 	private price: number;
 	private quantity: number;
 	private timestamp: number;
 
-	constructor(options: DealOptions) {
-		const { pair, direction, price, quantity, timestamp } = options;
+	constructor(options: DealConstructor) {
+		const { ticker, pair, direction, price, quantity, timestamp } = options;
 
 		this.ID = Deal.getNextID();
+		this.ticker = ticker;
 		this.pair = pair;
 		this.direction = direction;
 		this.price = price;
@@ -27,6 +38,10 @@ class Deal {
 
 	public getID(): number {
 		return this.ID;
+	}
+
+	public getTicker(): string {
+		return this.ticker;
 	}
 
 	public getPair(): string {
@@ -49,13 +64,5 @@ class Deal {
 		return this.timestamp;
 	}
 }
-
-type DealOptions = {
-	pair: string;
-	direction: OrderDirection;
-	price: number;
-	quantity: number;
-	timestamp: number;
-};
 
 export { Deal };

@@ -4,7 +4,7 @@ import pricesdataset from '@core/datasets/bars/btc_usdt_d.json';
 
 (async () => {
 	const bars = Bar.fromJSON(pricesdataset);
-	const tester = new TradingTester({ initialBalance: 1000, bars, pair: 'btc_usdt' });
+	const tester = new TradingTester({ balance: 1000, pair: 'btc_usdt', bars });
 
 	await tester.run();
 })();
