@@ -2,21 +2,21 @@ import { Deal } from '@core/trading/primitives';
 import { TradingDecision } from '@core/trading/strategy';
 
 export type SpotRiskManagerConstructor = {
-	style: RiskStyle;
+	riskBehaviour: RiskBehaviour;
 	comission: number;
 };
 
 abstract class SpotRiskManager {
 	protected ticker: string;
-	protected style: RiskStyle;
+	protected riskBehaviour: RiskBehaviour;
 	protected basisAssetBalance = 0;
 	protected targetAssetBalance = 0;
 	protected comission = 0;
 
 	constructor(options: SpotRiskManagerConstructor) {
-		const { style, comission } = options;
+		const { riskBehaviour, comission } = options;
 
-		this.style = style;
+		this.riskBehaviour = riskBehaviour;
 		this.comission = comission;
 	}
 
@@ -27,9 +27,9 @@ abstract class SpotRiskManager {
 	public abstract onDeal(deal: Deal): void;
 
 	public static getRiskParameters(options: GetRiskParametersOptions): RiskParameters {
-		const { style, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
+		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
 		const quantity = SpotRiskManager.getTradeQuantity({
-			style,
+			riskBehaviour,
 			basisAssetBalance,
 			targetAssetBalance,
 			price,
@@ -43,7 +43,7 @@ abstract class SpotRiskManager {
 			quantity,
 			decision,
 		});
-		const { stoploss, takeprofit } = SpotRiskManager.getTradeBoundaries({ style, price, decision });
+		const { stoploss, takeprofit } = SpotRiskManager.getTradeBoundaries({ riskBehaviour, price, decision });
 		const risk: RiskParameters = {
 			canTakeRisk,
 			quantity,
@@ -64,12 +64,12 @@ abstract class SpotRiskManager {
 	}
 
 	public static getTradeQuantity(options: GetQuantityOptions): number {
-		const { style, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
+		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
 		const percentsMap = {
-			[RiskStyle.AGGRESIVE]: 0.2,
-			[RiskStyle.CONSERVATIVE]: 0.1,
+			[RiskBehaviour.AGGRESIVE]: 0.2,
+			[RiskBehaviour.CONSERVATIVE]: 0.1,
 		};
-		const percent = percentsMap[style];
+		const percent = percentsMap[riskBehaviour];
 		const quantity = (basisAssetBalance * percent) / (price + comission);
 
 		if (decision === TradingDecision.SELL && targetAssetBalance > 0 && targetAssetBalance < quantity) {
@@ -80,17 +80,17 @@ abstract class SpotRiskManager {
 	}
 
 	public static getTradeBoundaries(options: GetTradeBoundariesOptions) {
-		const { style, price, decision } = options;
+		const { riskBehaviour, price, decision } = options;
 		const lossFactorsMap = {
-			[RiskStyle.AGGRESIVE]: 0.5,
-			[RiskStyle.CONSERVATIVE]: 0.3,
+			[RiskBehaviour.AGGRESIVE]: 0.5,
+			[RiskBehaviour.CONSERVATIVE]: 0.3,
 		};
 		const expectedValuesMap = {
-			[RiskStyle.AGGRESIVE]: 5,
-			[RiskStyle.CONSERVATIVE]: 3,
+			[RiskBehaviour.AGGRESIVE]: 5,
+			[RiskBehaviour.CONSERVATIVE]: 3,
 		};
-		const lossFactor = lossFactorsMap[style];
-		const expectedValue = expectedValuesMap[style];
+		const lossFactor = lossFactorsMap[riskBehaviour];
+		const expectedValue = expectedValuesMap[riskBehaviour];
 		const profitFactor = lossFactor * expectedValue;
 		const stoploss = decision === TradingDecision.BUY ? price - price * lossFactor : 0;
 		const takeprofit = decision === TradingDecision.BUY ? price + price * profitFactor : 0;
@@ -108,7 +108,7 @@ export type CalculateRiskParametersOptions = {
 };
 
 type GetRiskParametersOptions = {
-	style: RiskStyle;
+	riskBehaviour: RiskBehaviour;
 	basisAssetBalance: number;
 	targetAssetBalance: number;
 	price: number;
@@ -124,7 +124,7 @@ type DetectIsTradeAvailabelOptions = {
 	decision: TradingDecision;
 };
 
-export enum RiskStyle {
+export enum RiskBehaviour {
 	AGGRESIVE = 'aggresive',
 	CONSERVATIVE = 'conservative',
 }
@@ -137,13 +137,13 @@ export type RiskParameters = {
 };
 
 type GetTradeBoundariesOptions = {
-	style: RiskStyle;
+	riskBehaviour: RiskBehaviour;
 	price: number;
 	decision: TradingDecision;
 };
 
 type GetQuantityOptions = {
-	style: RiskStyle;
+	riskBehaviour: RiskBehaviour;
 	basisAssetBalance: number;
 	targetAssetBalance: number;
 	price: number;

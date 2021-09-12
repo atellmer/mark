@@ -24,3 +24,8 @@ declare module '*.csv' {
 	const value: any;
 	export default value;
 }
+
+type DateRange = {
+	dateStart: string;
+	dateEnd: string;
+};

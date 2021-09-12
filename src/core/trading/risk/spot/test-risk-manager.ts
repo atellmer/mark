@@ -21,12 +21,12 @@ class TestSpotRiskManager extends SpotRiskManager {
 	public calculateRiskParameters(options: CalculateRiskParametersOptions): Promise<RiskParameters> {
 		return new Promise<RiskParameters>(resolve => {
 			const { price, decision } = options;
-			const style = this.style;
+			const riskBehaviour = this.riskBehaviour;
 			const basisAssetBalance = this.basisAssetBalance;
 			const targetAssetBalance = this.targetAssetBalance;
 			const comission = this.comission;
 			const risk = SpotRiskManager.getRiskParameters({
-				style,
+				riskBehaviour,
 				basisAssetBalance,
 				targetAssetBalance,
 				price,

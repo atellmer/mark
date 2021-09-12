@@ -10,10 +10,8 @@ abstract class Market {
 		return this.pair;
 	}
 
-	protected mapSubscribers(fn: (subsctiber: MarketSubscriber) => void) {
-		for (const subscriber of this.subscribers) {
-			fn(subscriber);
-		}
+	protected mapSubscribers(fn: (subscriber: MarketSubscriber) => Promise<boolean>): Array<Promise<boolean>> {
+		return this.subscribers.map(subscriber => fn(subscriber));
 	}
 
 	public subscribe(subscriber: MarketSubscriber) {
@@ -26,7 +24,7 @@ abstract class Market {
 }
 
 export interface MarketSubscriber {
-	notifyAboutLastTick: (options: NotifyAboutLastTickOptions) => void;
+	notifyAboutLastTick: (options: NotifyAboutLastTickOptions) => Promise<boolean>;
 }
 
 export type NotifyAboutLastTickOptions = {

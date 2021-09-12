@@ -5,6 +5,13 @@ import { SpotRiskManager } from '@core/trading/risk';
 import { Order, OrderType, OrderDirection, Deal } from '@core/trading/primitives';
 import { Trader } from '@core/trading/trader';
 
+type TradingBotConstructor = {
+	pair: string;
+	ensemble: StrategyEnsemble;
+	manager: SpotRiskManager;
+	trader: Trader;
+};
+
 class TradingBot implements MarketSubscriber {
 	private pair: string;
 	private ticker: string;
@@ -13,7 +20,8 @@ class TradingBot implements MarketSubscriber {
 	private trader: Trader;
 	private subscribers: Array<Subscriber> = [];
 
-	constructor(pair: string, ensemble: StrategyEnsemble, manager: SpotRiskManager, trader: Trader) {
+	constructor(options: TradingBotConstructor) {
+		const { pair, ensemble, manager, trader } = options;
 		const ticker = extractTickerFromPair(pair);
 
 		this.pair = pair;
@@ -33,32 +41,36 @@ class TradingBot implements MarketSubscriber {
 		};
 	}
 
-	async notifyAboutLastTick(options: NotifyAboutLastTickOptions) {
-		const { pair, tick, timestamp } = options;
-		if (pair !== this.pair) return;
-		const ticker = this.ticker;
-		const price = tick;
-		const decision = await this.ensemble.getDecision({ tick });
-		const wantTrade = [TradingDecision.BUY, TradingDecision.SELL].includes(decision);
-		let deal: Deal = null;
+	notifyAboutLastTick(options: NotifyAboutLastTickOptions): Promise<boolean> {
+		return new Promise<boolean>(async resolve => {
+			const { pair, tick, timestamp } = options;
+			if (pair !== this.pair) return;
+			const ticker = this.ticker;
+			const price = tick;
+			const decision = await this.ensemble.getDecision({ tick });
+			const wantTrade = [TradingDecision.BUY, TradingDecision.SELL].includes(decision);
+			let deal: Deal = null;
 
-		if (wantTrade) {
-			const riskParameters = await this.manager.calculateRiskParameters({ price, decision });
-			const { canTakeRisk, quantity, stoploss, takeprofit } = riskParameters;
+			if (wantTrade) {
+				const riskParameters = await this.manager.calculateRiskParameters({ price, decision });
+				const { canTakeRisk, quantity, stoploss, takeprofit } = riskParameters;
 
-			if (canTakeRisk) {
-				const type = OrderType.MARKET;
-				const direction = getOrderDirection(decision);
-				const order = new Order({ ticker, pair, direction, type, price, quantity, stoploss, takeprofit, timestamp });
+				if (canTakeRisk) {
+					const type = OrderType.MARKET;
+					const direction = getOrderDirection(decision);
+					const order = new Order({ ticker, pair, direction, type, price, quantity, stoploss, takeprofit, timestamp });
 
-				deal = await this.trader.execute(order);
-				this.manager.onDeal(deal);
+					deal = await this.trader.execute(order);
+					this.manager.onDeal(deal);
+				}
 			}
-		}
 
-		for (const subscriber of this.subscribers) {
-			subscriber(deal);
-		}
+			for (const subscriber of this.subscribers) {
+				subscriber(deal);
+			}
+
+			resolve(true);
+		});
 	}
 }
 

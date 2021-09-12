@@ -11,8 +11,9 @@ class ExchangeMarket extends Market {
 			const pair = this.getPair();
 			const tick = await exchangeApi.fetchLastTick(pair);
 			const timestamp = getUnixTime();
+			const promises = this.mapSubscribers(x => x.notifyAboutLastTick({ pair, tick, timestamp }));
 
-			this.mapSubscribers(x => x.notifyAboutLastTick({ pair, tick, timestamp }));
+			await Promise.all(promises);
 		}, this.interval);
 	}
 
