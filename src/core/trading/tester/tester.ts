@@ -9,7 +9,7 @@ type TradingTesterConstructor = {
 	balance: number;
 	pair: string;
 	bars: Array<Bar>;
-	comission: number;
+	commission: number;
 	riskBehaviour: RiskBehaviour;
 	ensemble: StrategyEnsemble;
 	dateRange: DateRange;
@@ -20,18 +20,18 @@ class TradingTester {
 	private pair: string;
 	private bars: Array<Bar>;
 	private deals: Array<Deal> = [];
-	private comission = 0;
+	private commission = 0;
 	private riskBehaviour: RiskBehaviour;
 	private ensemble: StrategyEnsemble;
 	private dateRange: DateRange;
 
 	constructor(options: TradingTesterConstructor) {
-		const { balance, pair, bars, comission, riskBehaviour, ensemble, dateRange } = options;
+		const { balance, pair, bars, commission, riskBehaviour, ensemble, dateRange } = options;
 
 		this.balance = balance;
 		this.pair = pair;
 		this.bars = bars;
-		this.comission = comission;
+		this.commission = commission;
 		this.riskBehaviour = riskBehaviour;
 		this.ensemble = ensemble;
 		this.dateRange = dateRange;
@@ -39,12 +39,12 @@ class TradingTester {
 
 	public run(): Promise<TradeStatistics> {
 		return new Promise<TradeStatistics>(async resolve => {
-			const { pair, bars, balance, comission, riskBehaviour, ensemble, dateRange } = this;
+			const { pair, bars, balance, commission, riskBehaviour, ensemble, dateRange } = this;
 			const market = new TestMarket({ pair, bars, dateRange });
 			const manager = new TestSpotRiskManager({
 				basisAssetBalance: balance,
 				riskBehaviour,
-				comission,
+				commission,
 			});
 			const trader = new TestTrader();
 			const bot = new TradingBot({ pair, ensemble, manager, trader });

@@ -8,7 +8,7 @@ import pricesdataset from '@core/datasets/bars/btc_usdt_d.json';
 	const tester = new TradingTester({
 		pair: 'btc_usdt',
 		balance: 1000,
-		comission: 1,
+		commission: 1,
 		bars: Bar.fromJSON(pricesdataset),
 		riskBehaviour: RiskBehaviour.CONSERVATIVE,
 		ensemble: new StrategyEnsemble([new RandomStrategy()]),

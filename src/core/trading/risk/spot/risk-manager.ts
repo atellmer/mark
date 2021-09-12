@@ -3,7 +3,7 @@ import { TradingDecision } from '@core/trading/strategy';
 
 export type SpotRiskManagerConstructor = {
 	riskBehaviour: RiskBehaviour;
-	comission: number;
+	commission: number;
 };
 
 abstract class SpotRiskManager {
@@ -11,13 +11,13 @@ abstract class SpotRiskManager {
 	protected riskBehaviour: RiskBehaviour;
 	protected basisAssetBalance = 0;
 	protected targetAssetBalance = 0;
-	protected comission = 0;
+	protected commission = 0;
 
 	constructor(options: SpotRiskManagerConstructor) {
-		const { riskBehaviour, comission } = options;
+		const { riskBehaviour, commission } = options;
 
 		this.riskBehaviour = riskBehaviour;
-		this.comission = comission;
+		this.commission = commission;
 	}
 
 	public abstract getCurrentBasisAssetBalance(price: number): Promise<number>;
@@ -27,13 +27,13 @@ abstract class SpotRiskManager {
 	public abstract onDeal(deal: Deal): void;
 
 	public static getRiskParameters(options: GetRiskParametersOptions): RiskParameters {
-		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
+		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, commission, decision } = options;
 		const quantity = SpotRiskManager.getTradeQuantity({
 			riskBehaviour,
 			basisAssetBalance,
 			targetAssetBalance,
 			price,
-			comission,
+			commission,
 			decision,
 		});
 		const canTakeRisk = SpotRiskManager.detectIsTradeAvailable({
@@ -64,13 +64,13 @@ abstract class SpotRiskManager {
 	}
 
 	public static getTradeQuantity(options: GetQuantityOptions): number {
-		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, comission, decision } = options;
+		const { riskBehaviour, basisAssetBalance, targetAssetBalance, price, commission, decision } = options;
 		const percentsMap = {
 			[RiskBehaviour.AGGRESIVE]: 0.2,
 			[RiskBehaviour.CONSERVATIVE]: 0.1,
 		};
 		const percent = percentsMap[riskBehaviour];
-		const quantity = (basisAssetBalance * percent) / (price + comission);
+		const quantity = (basisAssetBalance * percent) / (price + commission);
 
 		if (decision === TradingDecision.SELL && targetAssetBalance > 0 && targetAssetBalance < quantity) {
 			return targetAssetBalance;
@@ -112,7 +112,7 @@ type GetRiskParametersOptions = {
 	basisAssetBalance: number;
 	targetAssetBalance: number;
 	price: number;
-	comission: number;
+	commission: number;
 	decision: TradingDecision;
 };
 
@@ -147,7 +147,7 @@ type GetQuantityOptions = {
 	basisAssetBalance: number;
 	targetAssetBalance: number;
 	price: number;
-	comission: number;
+	commission: number;
 	decision: TradingDecision;
 };
 
