@@ -3,7 +3,9 @@ import React, { useEffect, useMemo } from 'react';
 import { fix } from '@utils/math';
 import { getUnixFromTimestamp } from '@utils/date';
 import { AreaChart } from '@ui/kit/area-chart';
+import { Card } from '@ui/kit/card';
 import { TradingTester as TradingTesterLib, TradingTesterConstructor, BalanceRecord } from '@core/trading/tester';
+import { Root } from './styled';
 
 export type TradingTesterProps = {
 	testerOptions: TradingTesterConstructor;
@@ -50,9 +52,11 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 	}, [balances]);
 
 	return (
-		<div>
-			<AreaChart options={options as any} series={series} height={350} />
-		</div>
+		<Root>
+			<Card fullWidth>
+				<AreaChart options={options as any} series={series} height={350} />
+			</Card>
+		</Root>
 	);
 };
 

@@ -22,7 +22,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 			riskBehaviour: RiskBehaviour.CONSERVATIVE,
 			ensemble: new StrategyEnsemble([new RandomStrategy()]),
 			dateRange: {
-				dateStart: '01-01-2017 05:00:00',
+				dateStart: '01-01-2021 05:00:00',
 				dateEnd: '01-09-2021 05:00:00',
 			},
 			onChangeBalance: balanceRecord => {
