@@ -2,6 +2,8 @@ import React, { useEffect, useMemo } from 'react';
 
 import { fix } from '@utils/math';
 import { getUnixFromTimestamp } from '@utils/date';
+import { Bar } from '@core/trading/primitives';
+import { CandlestickChart } from '@ui/kit/candlestick-chart';
 import { AreaChart } from '@ui/kit/area-chart';
 import { Card } from '@ui/kit/card';
 import { TradingTester as TradingTesterLib, TradingTesterConstructor, BalanceRecord } from '@core/trading/tester';
@@ -10,10 +12,11 @@ import { Root } from './styled';
 export type TradingTesterProps = {
 	testerOptions: TradingTesterConstructor;
 	balances: Array<BalanceRecord>;
+	bars: Array<Bar>;
 };
 
 const TradingTester: React.FC<TradingTesterProps> = props => {
-	const { testerOptions, balances } = props;
+	const { testerOptions, balances, bars } = props;
 
 	useEffect(() => {
 		(async () => {
@@ -39,7 +42,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 		[],
 	);
 
-	const series = useMemo(() => {
+	const areaSeries = useMemo(() => {
 		const data = balances.map(x => [getUnixFromTimestamp(x.timestamp), fix(x.value, 2)]);
 
 		return [
@@ -53,8 +56,11 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 	return (
 		<Root>
+			<Card marginBottom={10} fullWidth>
+				<CandlestickChart bars={bars} height={240} />
+			</Card>
 			<Card fullWidth>
-				<AreaChart options={options as any} series={series} height={350} />
+				<AreaChart options={options as any} series={areaSeries} height={300} />
 			</Card>
 		</Root>
 	);

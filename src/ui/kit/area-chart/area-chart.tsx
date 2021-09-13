@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
 
@@ -10,7 +10,7 @@ export type AreaChartProps = {
 	series: Array<{ data: Array<any> }>;
 };
 
-const AreaChart: React.FC<AreaChartProps> = props => {
+const AreaChart: React.FC<AreaChartProps> = memo(props => {
 	const { height, series, options } = props;
 	const { theme } = useTheme();
 	const mergedOptions = useMemo(
@@ -58,18 +58,12 @@ const AreaChart: React.FC<AreaChartProps> = props => {
 					},
 				},
 			},
-			padding: {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0,
-			},
 			...options,
 		}),
 		[],
 	);
 
 	return <ReactApexChart options={mergedOptions as any} series={series} type='area' height={height} />;
-};
+});
 
 export { AreaChart };

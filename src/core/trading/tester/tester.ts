@@ -12,7 +12,6 @@ export type TradingTesterConstructor = {
 	commission: number;
 	riskBehaviour: RiskBehaviour;
 	ensemble: StrategyEnsemble;
-	dateRange: DateRange;
 	onChangeBalance: (x: BalanceRecord) => void;
 };
 
@@ -23,12 +22,11 @@ class TradingTester {
 	private commission = 0;
 	private riskBehaviour: RiskBehaviour;
 	private ensemble: StrategyEnsemble;
-	private dateRange: DateRange;
 	private balanceRecords: Array<BalanceRecord> = [];
 	private onChangeBalance: (x: BalanceRecord) => void;
 
 	constructor(options: TradingTesterConstructor) {
-		const { balance, pair, bars, commission, riskBehaviour, ensemble, dateRange, onChangeBalance } = options;
+		const { balance, pair, bars, commission, riskBehaviour, ensemble, onChangeBalance } = options;
 
 		this.balance = balance;
 		this.pair = pair;
@@ -36,14 +34,13 @@ class TradingTester {
 		this.commission = commission;
 		this.riskBehaviour = riskBehaviour;
 		this.ensemble = ensemble;
-		this.dateRange = dateRange;
 		this.onChangeBalance = onChangeBalance || (() => {});
 	}
 
 	public run(): Promise<TradeStatistics> {
 		return new Promise<TradeStatistics>(async resolve => {
-			const { pair, bars, balance, commission, riskBehaviour, ensemble, dateRange, onChangeBalance } = this;
-			const market = new TestMarket({ pair, bars, dateRange });
+			const { pair, bars, balance, commission, riskBehaviour, ensemble, balanceRecords, onChangeBalance } = this;
+			const market = new TestMarket({ pair, bars });
 			const manager = new TestSpotRiskManager({
 				basisAssetBalance: balance,
 				riskBehaviour,
@@ -58,8 +55,8 @@ class TradingTester {
 					value: balance,
 					timestamp: deal.getTimestamp(),
 				};
-				this.balanceRecords.push(record);
-				this.onChangeBalance(record);
+				balanceRecords.push(record);
+				onChangeBalance(record);
 			};
 
 			bot.subscribe(onDecision);
