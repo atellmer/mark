@@ -22,7 +22,7 @@ const AreaChart: React.FC<AreaChartProps> = memo(props => {
 				type: 'area',
 				width: '100%',
 				height,
-				background: '#1D3051',
+				background: 'transparent',
 				zoom: {
 					autoScaleYaxis: true,
 				},

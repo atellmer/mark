@@ -13,16 +13,16 @@ function mmToPx(value: number) {
 
 function createBoxShadow(elevation: ShadowElevation) {
 	const map = {
-		1: `box-shadow: 0 1px 4px rgba(0, 0, 0, 0.11), 0 1px 2px rgba(0, 0, 0, 0.11);`,
-		2: `box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.12);`,
-		3: `box-shadow: 0 1px 8px rgba(0, 0, 0, 0.13), 0 1px 6px rgba(0, 0, 0, 0.13);`,
-		4: `box-shadow: 0 1px 10px rgba(0, 0, 0, 0.14), 0 1px 8px rgba(0, 0, 0, 0.14);`,
-		5: `box-shadow: 0 1px 12px rgba(0, 0, 0, 0.15), 0 1px 10px rgba(0, 0, 0, 0.15);`,
-		6: `box-shadow: 0 1px 14px rgba(0, 0, 0, 0.16), 0 1px 12px rgba(0, 0, 0, 0.16);`,
-		7: `box-shadow: 0 1px 16px rgba(0, 0, 0, 0.17), 0 1px 14px rgba(0, 0, 0, 0.17);`,
-		8: `box-shadow: 0 1px 18px rgba(0, 0, 0, 0.18), 0 1px 16px rgba(0, 0, 0, 0.18);`,
-		9: `box-shadow: 0 1px 20px rgba(0, 0, 0, 0.19), 0 1px 18px rgba(0, 0, 0, 0.19);`,
-		10: `box-shadow: 0 1px 22px rgba(0, 0, 0, 0.20), 0 1px 20px rgba(0, 0, 0, 0.20);`,
+		1: `box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.4);`,
+		2: `box-shadow: 0 1px 6px rgba(0, 0, 0, 0.41), 0 1px 4px rgba(0, 0, 0.41);`,
+		3: `box-shadow: 0 1px 8px rgba(0, 0, 0, 0.42), 0 1px 6px rgba(0, 0, 0, 0.42);`,
+		4: `box-shadow: 0 1px 10px rgba(0, 0, 0, 0.43), 0 1px 8px rgba(0, 0, 0, 0.43);`,
+		5: `box-shadow: 0 1px 12px rgba(0, 0, 0, 0.44), 0 1px 10px rgba(0, 0, 0, 0.44);`,
+		6: `box-shadow: 0 1px 14px rgba(0, 0, 0, 0.45), 0 1px 12px rgba(0, 0, 0, 0.45);`,
+		7: `box-shadow: 0 1px 16px rgba(0, 0, 0, 0.46), 0 1px 14px rgba(0, 0, 0, 0.46);`,
+		8: `box-shadow: 0 1px 18px rgba(0, 0, 0, 0.47), 0 1px 16px rgba(0, 0, 0, 0.47);`,
+		9: `box-shadow: 0 1px 20px rgba(0, 0, 0, 0.48), 0 1px 18px rgba(0, 0, 0, 0.48);`,
+		10: `box-shadow: 0 1px 22px rgba(0, 0, 0, 0.49), 0 1px 20px rgba(0, 0, 0, 0.49);`,
 	};
 
 	return map[elevation] || '';

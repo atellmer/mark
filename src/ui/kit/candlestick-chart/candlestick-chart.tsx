@@ -43,7 +43,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = memo(props => {
 				type: 'candlestick',
 				width: '100%',
 				id: 'candles',
-				background: '#1D3051',
+				background: 'transparent',
 				toolbar: {
 					autoSelected: 'pan',
 					show: false,
@@ -53,6 +53,14 @@ const CandlestickChart: React.FC<CandlestickChartProps> = memo(props => {
 				},
 				animations: {
 					enabled: false,
+				},
+			},
+			plotOptions: {
+				candlestick: {
+					colors: {
+						upward: '#06D6A0',
+						downward: '#EF476F',
+					},
 				},
 			},
 			xaxis: {
@@ -93,6 +101,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = memo(props => {
 		return [
 			{
 				name: 'Volume',
+				color: '#06D6A0',
 				data,
 			},
 		];
@@ -108,7 +117,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = memo(props => {
 				enabled: true,
 				target: 'candles',
 			},
-			background: '#1D3051',
+			background: 'transparent',
 			selection: {
 				enabled: true,
 				xaxis: {

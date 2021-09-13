@@ -56,7 +56,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 	return (
 		<Root>
-			<Card marginBottom={10} fullWidth>
+			<Card marginBottom={16} fullWidth>
 				<CandlestickChart bars={bars} height={240} />
 			</Card>
 			<Card fullWidth>

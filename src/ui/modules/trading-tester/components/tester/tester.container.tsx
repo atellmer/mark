@@ -14,7 +14,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 	const [balances, setBalances] = useState<Array<BalanceRecord>>([]);
 	const scope = useMemo(() => ({ balances }), []);
 	const dateRange: DateRange = {
-		dateStart: '01-01-2020 05:00:00',
+		dateStart: '01-01-2021 05:00:00',
 		dateEnd: '01-09-2021 05:00:00',
 	};
 	const bars = useMemo(() => filterBars(Bar.fromJSON(pricesdataset), dateRange), []);
