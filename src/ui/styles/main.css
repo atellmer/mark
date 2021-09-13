@@ -16,9 +16,8 @@ body, html {
 }
 
 body {
-	font-family: Roboto, arial;
 	-webkit-font-smoothing: antialiased;
-	background-color: #24103D;
+	overflow-x: hidden;
 }
 
 p {

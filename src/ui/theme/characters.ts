@@ -12,8 +12,8 @@ const themesMap: ThemesByBrandsMap = {
 			alarm: '#AC0014',
 			text: '#fff',
 			hint: '#55084C',
-			stealth: '#3D0C45',
-			space: '#24103D',
+			stealth: '#4A4453',
+			space: '#0C0513',
 		},
 		button: {
 			contained: {

@@ -5,7 +5,7 @@ import { TestSpotRiskManager, RiskBehaviour } from '@core/trading/risk';
 import { TestTrader } from '@core/trading/trader';
 import { TradingBot } from '@core/trading/bot';
 
-type TradingTesterConstructor = {
+export type TradingTesterConstructor = {
 	balance: number;
 	pair: string;
 	bars: Array<Bar>;
@@ -13,20 +13,22 @@ type TradingTesterConstructor = {
 	riskBehaviour: RiskBehaviour;
 	ensemble: StrategyEnsemble;
 	dateRange: DateRange;
+	onChangeBalance: (x: BalanceRecord) => void;
 };
 
 class TradingTester {
 	private balance: number;
 	private pair: string;
 	private bars: Array<Bar>;
-	private deals: Array<Deal> = [];
 	private commission = 0;
 	private riskBehaviour: RiskBehaviour;
 	private ensemble: StrategyEnsemble;
 	private dateRange: DateRange;
+	private balanceRecords: Array<BalanceRecord> = [];
+	private onChangeBalance: (x: BalanceRecord) => void;
 
 	constructor(options: TradingTesterConstructor) {
-		const { balance, pair, bars, commission, riskBehaviour, ensemble, dateRange } = options;
+		const { balance, pair, bars, commission, riskBehaviour, ensemble, dateRange, onChangeBalance } = options;
 
 		this.balance = balance;
 		this.pair = pair;
@@ -35,11 +37,12 @@ class TradingTester {
 		this.riskBehaviour = riskBehaviour;
 		this.ensemble = ensemble;
 		this.dateRange = dateRange;
+		this.onChangeBalance = onChangeBalance || (() => {});
 	}
 
 	public run(): Promise<TradeStatistics> {
 		return new Promise<TradeStatistics>(async resolve => {
-			const { pair, bars, balance, commission, riskBehaviour, ensemble, dateRange } = this;
+			const { pair, bars, balance, commission, riskBehaviour, ensemble, dateRange, onChangeBalance } = this;
 			const market = new TestMarket({ pair, bars, dateRange });
 			const manager = new TestSpotRiskManager({
 				basisAssetBalance: balance,
@@ -48,8 +51,18 @@ class TradingTester {
 			});
 			const trader = new TestTrader();
 			const bot = new TradingBot({ pair, ensemble, manager, trader });
+			const onDecision = async (deal: Deal | null) => {
+				if (!deal) return;
+				const balance = await manager.getCurrentBasisAssetBalance(deal.getPrice());
+				const record: BalanceRecord = {
+					value: balance,
+					timestamp: deal.getTimestamp(),
+				};
+				this.balanceRecords.push(record);
+				this.onChangeBalance(record);
+			};
 
-			bot.subscribe(deal => deal && this.deals.push(deal));
+			bot.subscribe(onDecision);
 			market.subscribe(bot);
 
 			const tick = await market.start();
@@ -57,6 +70,7 @@ class TradingTester {
 
 			resolve({
 				basisAssetBalance,
+				balanceRecords: this.balanceRecords,
 			});
 		});
 	}
@@ -64,6 +78,12 @@ class TradingTester {
 
 type TradeStatistics = {
 	basisAssetBalance: number;
+	balanceRecords: Array<BalanceRecord>;
+};
+
+export type BalanceRecord = {
+	value: number;
+	timestamp: number;
 };
 
 export { TradingTester };
