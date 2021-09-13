@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
-import ReactApexChart from 'react-apexcharts';
 
 import { fix } from '@utils/math';
-import { useTheme } from '@ui/theme';
+import { getUnixFromTimestamp } from '@utils/date';
+import { AreaChart } from '@ui/kit/area-chart';
 import { TradingTester as TradingTesterLib, TradingTesterConstructor, BalanceRecord } from '@core/trading/tester';
 
 export type TradingTesterProps = {
@@ -12,7 +12,6 @@ export type TradingTesterProps = {
 
 const TradingTester: React.FC<TradingTesterProps> = props => {
 	const { testerOptions, balances } = props;
-	const { theme } = useTheme();
 
 	useEffect(() => {
 		(async () => {
@@ -25,27 +24,8 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 	const options = useMemo(
 		() => ({
-			theme: {
-				mode: 'dark',
-			},
-			chart: {
-				type: 'area',
-				height: 350,
-				background: '#1D3051',
-				zoom: {
-					autoScaleYaxis: true,
-				},
-			},
-			dataLabels: {
-				enabled: false,
-			},
-			markers: {
-				size: 0,
-				style: 'hollow',
-			},
 			xaxis: {
 				type: 'datetime',
-				//min: new Date('01 Mar 2012').getTime(),
 				tickAmount: 6,
 			},
 			tooltip: {
@@ -53,26 +33,12 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 					format: 'dd MMM yyyy',
 				},
 			},
-			fill: {
-				type: 'gradient',
-				gradient: {
-					shade: 'dark',
-					shadeIntensity: 1,
-					opacityFrom: 0.7,
-					opacityTo: 0.9,
-					stops: [0, 100],
-				},
-			},
-			grid: {
-				show: true,
-				borderColor: theme.palette.stealth,
-			},
 		}),
 		[],
 	);
 
 	const series = useMemo(() => {
-		const data = balances.map(x => [x.timestamp * 1000, fix(x.value, 2)]);
+		const data = balances.map(x => [getUnixFromTimestamp(x.timestamp), fix(x.value, 2)]);
 
 		return [
 			{
@@ -85,7 +51,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 	return (
 		<div>
-			<ReactApexChart options={options as any} series={series} type='area' height={350} />
+			<AreaChart options={options as any} series={series} height={350} />
 		</div>
 	);
 };
