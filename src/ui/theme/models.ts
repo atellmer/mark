@@ -29,6 +29,10 @@ export type Theme = {
 		alarm: AlertTheme;
 		success: AlertTheme;
 	};
+	card: CardTheme;
+	chart: {
+		candlestick: CandlestickChartTheme;
+	};
 	fn: {
 		createBoxShadow: (elevation: ShadowElevation) => string;
 		pxToRem: (value: number) => string;
@@ -61,4 +65,12 @@ type AlertTheme = {
 	textColor: string;
 	backgroundColor: string;
 	borderColor: string;
+};
+
+type CardTheme = {
+	backgroundColor: string;
+};
+
+type CandlestickChartTheme = {
+	backgroundColor: string;
 };

@@ -57,6 +57,14 @@ const themesMap: ThemesByBrandsMap = {
 				borderColor: lighten('#26d06d', 0.6),
 			},
 		},
+		card: {
+			backgroundColor: '#120822',
+		},
+		chart: {
+			candlestick: {
+				backgroundColor: '#120822',
+			},
+		},
 		fn: {
 			pxToRem,
 			createBoxShadow,

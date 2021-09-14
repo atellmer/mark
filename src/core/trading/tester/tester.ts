@@ -12,7 +12,7 @@ export type TradingTesterConstructor = {
 	commission: number;
 	riskBehaviour: RiskBehaviour;
 	ensemble: StrategyEnsemble;
-	onChangeBalance: (x: BalanceRecord) => void;
+	onChangeBalance?: (x: BalanceRecord) => void;
 };
 
 class TradingTester {

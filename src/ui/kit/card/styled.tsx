@@ -18,7 +18,7 @@ const Root = styled(({ elevation, hoverElevation, fullWidth, ...rest }) => <Box 
 	${p => p.theme.fn.createBoxShadow(p.elevation)}
 
 	${(p: RootProps) => css`
-		background-color: #120822;
+		background-color: ${p.theme.card.backgroundColor};
 	`}
 
 	&:hover {

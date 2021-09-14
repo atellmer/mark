@@ -22,6 +22,7 @@
 		"apexcharts": "^3.28.1",
 		"axios": "^0.16.2",
 		"file-saver": "^2.0.5",
+		"lightweight-charts": "^3.6.1",
 		"mathjs": "^9.4.4",
 		"moment": "2.24.0",
 		"normalize.css": "^8.0.1",
@@ -30,6 +31,7 @@
 		"react-dom": "17.0.1",
 		"react-md-spinner": "^1.0.0",
 		"react-router-dom": "5.2.0",
+		"react-use-measure": "^2.0.4",
 		"styled-components": "5.2.0"
 	},
 	"devDependencies": {

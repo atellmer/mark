@@ -1,66 +1,30 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
-import { fix } from '@utils/math';
-import { getUnixFromTimestamp } from '@utils/date';
 import { Bar } from '@core/trading/primitives';
-import { CandlestickChart } from '@ui/kit/candlestick-chart';
-import { AreaChart } from '@ui/kit/area-chart';
+import { CandlestickChart, createPriceDataFromBars, createVolumeDataFromBars } from '@ui/kit/candlestick-chart';
+import { AreaChart, createAreaDataFromBalanceRecords } from '@ui/kit/area-chart';
 import { Card } from '@ui/kit/card';
-import { TradingTester as TradingTesterLib, TradingTesterConstructor, BalanceRecord } from '@core/trading/tester';
+import { BalanceRecord } from '@core/trading/tester';
 import { Root } from './styled';
 
 export type TradingTesterProps = {
-	testerOptions: TradingTesterConstructor;
-	balances: Array<BalanceRecord>;
+	balanceRecords: Array<BalanceRecord>;
 	bars: Array<Bar>;
 };
 
 const TradingTester: React.FC<TradingTesterProps> = props => {
-	const { testerOptions, balances, bars } = props;
-
-	useEffect(() => {
-		(async () => {
-			const tester = new TradingTesterLib(testerOptions);
-			const { basisAssetBalance } = await tester.run();
-
-			console.log('balance', basisAssetBalance);
-		})();
-	}, []);
-
-	const options = useMemo(
-		() => ({
-			xaxis: {
-				type: 'datetime',
-				tickAmount: 6,
-			},
-			tooltip: {
-				x: {
-					format: 'dd MMM yyyy',
-				},
-			},
-		}),
-		[],
-	);
-
-	const areaSeries = useMemo(() => {
-		const data = balances.map(x => [getUnixFromTimestamp(x.timestamp), fix(x.value, 2)]);
-
-		return [
-			{
-				name: 'Equity',
-				color: '#00C2FB',
-				data,
-			},
-		];
-	}, [balances]);
+	const { balanceRecords, bars } = props;
+	const priceData = useMemo(() => createPriceDataFromBars(bars), [bars]);
+	const volumeData = useMemo(() => createVolumeDataFromBars(bars), [bars]);
+	const balanceRecordsData = useMemo(() => createAreaDataFromBalanceRecords(balanceRecords), [balanceRecords]);
 
 	return (
 		<Root>
 			<Card marginBottom={16} fullWidth>
-				<CandlestickChart bars={bars} height={240} />
+				<CandlestickChart priceData={priceData} volumeData={volumeData} height={400} />
 			</Card>
 			<Card fullWidth>
-				<AreaChart options={options as any} series={areaSeries} height={300} />
+				<AreaChart data={balanceRecordsData} height={300} fitContent />
 			</Card>
 		</Root>
 	);
