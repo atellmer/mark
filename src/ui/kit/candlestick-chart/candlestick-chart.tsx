@@ -86,9 +86,11 @@ const CandlestickChart = memo(
 			});
 
 			chartRef.current.subscribeCrosshairMove(param => {
-				const value = param.seriesPrices.get(scope.candlestickSeries) || '';
+				const value = param.seriesPrices.get(scope.candlestickSeries) as Partial<BarData>;
 
-				legend.innerHTML = `${name} ${value}`;
+				legend.innerHTML = value
+					? `${name} O: ${value.open}, H: ${value.high}, L: ${value.low}, C: ${value.close}`
+					: name;
 			});
 		}, []);
 

@@ -16,12 +16,37 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 	const [balanceRecords, setBalanceRecords] = useState<Array<BalanceRecord>>([]);
 	const [bars, setBars] = useState<Array<Bar>>([]);
 	const pair = 'btc_usdt';
+	const balance = 1000;
+	const commission = 1;
+	const riskBehaviour = RiskBehaviour.CONSERVATIVE;
+	const ensemble = useMemo(() => new StrategyEnsemble([new RandomStrategy()]), []);
 	const dateRange: DateRange = {
 		dateStart: '01-01-2017 05:00:00',
 		dateEnd: '01-09-2021 05:00:00',
 	};
 	const sourceBars = useMemo(() => filterBars(Bar.fromJSON(pricesdataset), dateRange), []);
 	const { isPriceTracking } = useVariant(variant);
+
+	useEffect(() => {
+		(async () => {
+			const tester = new TradingTesterLib({
+				pair,
+				balance,
+				commission,
+				bars: sourceBars,
+				riskBehaviour,
+				ensemble,
+			});
+			const { balanceRecords } = await tester.run();
+
+			isPriceTracking ? trackPrice(balanceRecords) : trackYield(balanceRecords);
+		})();
+	}, []);
+
+	useEffect(() => {
+		if (isPriceTracking) return;
+		setBars(sourceBars);
+	}, [isPriceTracking]);
 
 	const trackPrice = (balanceRecords: Array<BalanceRecord>) => {
 		const [firstBar] = sourceBars;
@@ -70,27 +95,6 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 		update(firstBalanceRecord);
 	};
-
-	useEffect(() => {
-		(async () => {
-			const tester = new TradingTesterLib({
-				pair,
-				balance: 1000,
-				commission: 1,
-				bars: sourceBars,
-				riskBehaviour: RiskBehaviour.CONSERVATIVE,
-				ensemble: new StrategyEnsemble([new RandomStrategy()]),
-			});
-			const { balanceRecords } = await tester.run();
-
-			isPriceTracking ? trackPrice(balanceRecords) : trackYield(balanceRecords);
-		})();
-	}, []);
-
-	useEffect(() => {
-		if (isPriceTracking) return;
-		setBars(sourceBars);
-	}, [isPriceTracking]);
 
 	return <XTradingTester {...props} variant={variant} pair={pair} balanceRecords={balanceRecords} bars={bars} />;
 };
