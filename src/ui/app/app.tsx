@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 
 import '@ui/styles/index.css';
 import { routes } from '@ui/routing';
-import { TradingTester } from '@ui/modules/trading-tester/components/tester';
+import TradingTesterEntry from '@ui/modules/trading-tester/components/entry';
 
 export type AppProps = {};
 
@@ -11,7 +11,7 @@ const App: React.FC<AppProps> = () => {
 	return (
 		<>
 			<Switch>
-				<Route path={routes.root} render={() => <TradingTester />} />
+				<Route path={routes.root} render={() => <TradingTesterEntry />} />
 				<Redirect to={routes.root} />
 			</Switch>
 		</>

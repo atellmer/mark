@@ -23,12 +23,12 @@ function groupBy<T>(elements: Array<T>, selector: (x: T) => string | number): Re
 	return map;
 }
 
+function createObjectMap<T = any>(items: Array<T> = [], getID: (item: T) => number | string): Record<string, T> {
+	return items.reduce((acc, x) => ((acc[getID(x)] = x), acc), {});
+}
+
 function createListFromMap<T = any>(map: Record<string, T> = {}): Array<T> {
 	return Object.keys(map).reduce((acc, key) => (acc.push(map[key]), acc), []);
 }
 
-function keysCount<T extends object>(value: T): number {
-	return Object.keys(value).length;
-}
-
-export { detectIsFunction, detectIsUndefined, groupBy, createListFromMap, keysCount };
+export { detectIsFunction, detectIsUndefined, groupBy, createObjectMap, createListFromMap };
