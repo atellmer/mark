@@ -4,6 +4,8 @@ import {
 	ColorType,
 	LineData,
 	UTCTimestamp,
+	LineWidth,
+	MouseEventParams,
 	IChartApi as ChartApi,
 	ISeriesApi as SeriesApi,
 } from 'lightweight-charts';
@@ -12,8 +14,10 @@ import useMeasure from 'react-use-measure';
 import { fix } from '@utils/math';
 import type { BalanceRecord } from '@core/trading/tester';
 import { useTheme } from '@ui/theme';
+import { Root } from './styled';
 
 export type AreaChartProps = {
+	name: string;
 	height: number;
 	data: Array<LineData>;
 	fitContent?: boolean;
@@ -21,20 +25,20 @@ export type AreaChartProps = {
 
 const AreaChart = memo(
 	forwardRef<{}, AreaChartProps>((props, ref) => {
-		const { height: inititalHeight, data, fitContent } = props;
-		const rootRef = useRef<HTMLDivElement>();
+		const { height: inititalHeight, data, name, fitContent } = props;
+		const containerRef = useRef<HTMLDivElement>();
 		const chartRef = useRef<ChartApi>();
 		const [measureRef, { width, height }] = useMeasure();
 		const { theme } = useTheme();
 		const scope: Scope = useMemo(() => ({ areaSeries: null }), []);
 
-		const setRootRef = (elementRef: HTMLDivElement) => {
-			rootRef.current = elementRef;
+		const setContainerRef = (elementRef: HTMLDivElement) => {
+			containerRef.current = elementRef;
 			measureRef(elementRef);
 		};
 
 		useEffect(() => {
-			chartRef.current = createChart(rootRef.current, {
+			chartRef.current = createChart(containerRef.current, {
 				width,
 				height: inititalHeight,
 				layout: {
@@ -56,12 +60,30 @@ const AreaChart = memo(
 						visible: true,
 					},
 				},
+				crosshair: {
+					vertLine: {
+						width: 5 as LineWidth,
+						color: 'rgba(224, 227, 235, 0.1)',
+						style: 0,
+					},
+					horzLine: {
+						visible: false,
+						labelVisible: false,
+					},
+				},
 				kineticScroll: {
 					mouse: true,
 				},
 			});
+			const legend = createLegendElement(containerRef.current, name);
 
 			scope.areaSeries = chartRef.current.addAreaSeries({});
+
+			chartRef.current.subscribeCrosshairMove(param => {
+				const value = param.seriesPrices.get(scope.areaSeries) || '';
+
+				legend.innerHTML = `${name} ${value}`;
+			});
 		}, []);
 
 		useEffect(() => {
@@ -76,13 +98,28 @@ const AreaChart = memo(
 			chartRef.current.resize(width, height, true);
 		}, [width, height]);
 
-		return <div ref={setRootRef} />;
+		return (
+			<Root>
+				<div ref={setContainerRef} />
+			</Root>
+		);
 	}),
 );
 
 type Scope = {
 	areaSeries: SeriesApi<'Area'>;
 };
+
+function createLegendElement(container: HTMLDivElement, text = '') {
+	const legend = document.createElement('div');
+
+	legend.classList.add('legend');
+	legend.innerHTML = text;
+
+	container.appendChild(legend);
+
+	return legend;
+}
 
 function createAreaDataFromBalanceRecords(balanceRecords: Array<BalanceRecord>) {
 	const data = balanceRecords.map(x => ({ time: x.timestamp as UTCTimestamp, value: fix(x.value, 2) }));

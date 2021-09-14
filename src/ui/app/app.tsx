@@ -11,8 +11,8 @@ const App: React.FC<AppProps> = () => {
 	return (
 		<>
 			<Switch>
-				<Route path={routes.root} render={() => <TradingTesterEntry />} />
-				<Redirect to={routes.root} />
+				<Route path={routes.tester} component={TradingTesterEntry} />
+				<Redirect to={routes.tester} />
 			</Switch>
 		</>
 	);

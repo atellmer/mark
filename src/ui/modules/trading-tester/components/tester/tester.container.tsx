@@ -15,6 +15,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 	const { variant } = props;
 	const [balanceRecords, setBalanceRecords] = useState<Array<BalanceRecord>>([]);
 	const [bars, setBars] = useState<Array<Bar>>([]);
+	const pair = 'btc_usdt';
 	const dateRange: DateRange = {
 		dateStart: '01-01-2017 05:00:00',
 		dateEnd: '01-09-2021 05:00:00',
@@ -73,7 +74,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 	useEffect(() => {
 		(async () => {
 			const tester = new TradingTesterLib({
-				pair: 'btc_usdt',
+				pair,
 				balance: 1000,
 				commission: 1,
 				bars: sourceBars,
@@ -91,7 +92,7 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 		setBars(sourceBars);
 	}, [isPriceTracking]);
 
-	return <XTradingTester {...props} variant={variant} balanceRecords={balanceRecords} bars={bars} />;
+	return <XTradingTester {...props} variant={variant} pair={pair} balanceRecords={balanceRecords} bars={bars} />;
 };
 
 const UPDATE_INTERVAL = 100;

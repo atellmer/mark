@@ -1,11 +1,11 @@
 const baseURL = '/';
 
 const routes = {
-	root: `${baseURL}root/`,
+	tester: `${baseURL}tester/`,
 };
 
-function createLinkToRoot() {
-	return routes.root;
+function createLinkToTester() {
+	return routes.tester;
 }
 
-export { routes, createLinkToRoot };
+export { routes, createLinkToTester };

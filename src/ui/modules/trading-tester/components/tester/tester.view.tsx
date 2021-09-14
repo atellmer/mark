@@ -9,12 +9,13 @@ import { Root } from './styled';
 
 export type TradingTesterProps = {
 	variant: 'price-tracking' | 'yield-tracking';
+	pair: string;
 	balanceRecords: Array<BalanceRecord>;
 	bars: Array<Bar>;
 };
 
 const TradingTester: React.FC<TradingTesterProps> = props => {
-	const { variant, balanceRecords, bars } = props;
+	const { variant, pair, balanceRecords, bars } = props;
 	const { isPriceTracking } = useVariant(variant);
 	const priceData = useMemo(() => createPriceDataFromBars(bars), [bars]);
 	const volumeData = useMemo(() => createVolumeDataFromBars(bars), [bars]);
@@ -24,11 +25,11 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 		<Root>
 			{isPriceTracking && (
 				<Card marginBottom={16} fullWidth>
-					<CandlestickChart priceData={priceData} volumeData={volumeData} height={300} />
+					<CandlestickChart name={`[${pair}] Price`} priceData={priceData} volumeData={volumeData} height={300} />
 				</Card>
 			)}
 			<Card fullWidth>
-				<AreaChart data={balanceRecordsData} height={300} fitContent />
+				<AreaChart name={`[${pair}] Yield curve`} data={balanceRecordsData} height={300} fitContent />
 			</Card>
 		</Root>
 	);
