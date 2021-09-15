@@ -7,7 +7,7 @@ import { RiskBehaviour } from '@core/trading/risk';
 import { TradingTester as TradingTesterLib, BalanceRecord } from '@core/trading/tester';
 import { StrategyEnsemble, RandomStrategy } from '@core/trading/strategy';
 import { TradingTester as XTradingTester, TradingTesterProps as XTradingTesterProps, useVariant } from './tester.view';
-import pricesdataset from '@core/datasets/bars/btc_usdt_d.json';
+import pricesdataset from '@core/datasets/data/bars/cryptocompare/btc_usdt_d.json';
 
 export type TradingTesterProps = {} & Partial<Pick<XTradingTesterProps, 'variant'>>;
 

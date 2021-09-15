@@ -4,7 +4,7 @@ import { Bar } from '@core/trading/primitives';
 function bitcoinPriceTemperature(bars: Array<Bar>) {
 	const temperatures: Array<PriceTemperature> = [];
 	if (bars.length <= FOUR_YEAR_CYCLE_DAYS) return temperatures;
-	const values = bars.map(x => x.getHight());
+	const values = bars.map(x => (x.getHight() + x.getLow()) / 2);
 
 	for (let i = FOUR_YEAR_CYCLE_DAYS; i < values.length; i++) {
 		const idx = i - FOUR_YEAR_CYCLE_DAYS;

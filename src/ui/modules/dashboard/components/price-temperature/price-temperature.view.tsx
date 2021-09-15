@@ -6,7 +6,7 @@ import { Bar } from '@core/trading/primitives';
 import { Card } from '@ui/kit/card';
 import { useTheme } from '@ui/theme';
 import { Root } from './styled';
-import pricesdataset from '@core/datasets/bars/btc_usdt_d.json';
+import pricesdataset from '@core/datasets/data/bars/investing/btc_usdt_d.json';
 
 export type PriceTemperatureProps = {};
 
@@ -14,11 +14,41 @@ const PriceTemperature: React.FC<PriceTemperatureProps> = props => {
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
 	const temperatures = bitcoinPriceTemperature(bars);
 	const { theme } = useTheme();
-
+	const temperatureSeriesData = temperatures.map(x => ({ x: x.time * 1000, y: x.value }));
+	const [firstPoint] = temperatureSeriesData;
+	const lastPoint = temperatureSeriesData[temperatureSeriesData.length - 1];
 	const series = [
 		{
-			name: 'Price temperature',
-			data: temperatures.map(x => ({ x: x.time * 1000, y: x.value })),
+			name: 'Price temperature curve',
+			data: temperatureSeriesData,
+		},
+		{
+			name: 'StrongSell',
+			data: [
+				{ x: firstPoint.x, y: 8 },
+				{ x: lastPoint.x, y: 8 },
+			],
+		},
+		{
+			name: 'Sell',
+			data: [
+				{ x: firstPoint.x, y: 6 },
+				{ x: lastPoint.x, y: 6 },
+			],
+		},
+		{
+			name: 'Buy',
+			data: [
+				{ x: firstPoint.x, y: 2 },
+				{ x: lastPoint.x, y: 2 },
+			],
+		},
+		{
+			name: 'StrongBuy',
+			data: [
+				{ x: firstPoint.x, y: 0 },
+				{ x: lastPoint.x, y: 0 },
+			],
 		},
 	];
 	const options = {
@@ -28,14 +58,19 @@ const PriceTemperature: React.FC<PriceTemperatureProps> = props => {
 		chart: {
 			background: 'transparent',
 			zoom: {
-				enabled: false,
+				enabled: true,
 			},
+		},
+		legend: {
+			show: false,
 		},
 		dataLabels: {
 			enabled: false,
 		},
 		stroke: {
 			curve: 'straight',
+			width: [5, 3, 3, 3, 3],
+			dashArray: [0, 4, 4, 4, 4],
 		},
 		grid: {
 			show: true,
@@ -44,7 +79,6 @@ const PriceTemperature: React.FC<PriceTemperatureProps> = props => {
 		xaxis: {
 			type: 'datetime',
 		},
-		colors: ['#4392F1'],
 		fill: {
 			type: 'gradient',
 			gradient: {

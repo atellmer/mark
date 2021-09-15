@@ -18,4 +18,4 @@ function getUnixFromTimestamp(timestamp: number) {
 	return timestamp * 1000;
 }
 
-export { convertUnixTimeToTime, getUnixTime, getTimestamp, getUnixFromTimestamp };
+export { BASE_TIME_FORMAT, convertUnixTimeToTime, getUnixTime, getTimestamp, getUnixFromTimestamp };
