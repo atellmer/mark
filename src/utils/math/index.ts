@@ -38,4 +38,19 @@ function fix(x: number, precision = 4): number {
 	return Number(x.toFixed(precision));
 }
 
-export { mean, pow, sqrt, exp, random, abs, log, min, max, fix };
+function sd(values: Array<number>) {
+	const length = values.length;
+	if (length === 1) return values[0];
+	const average = mean(values);
+	let stddev = 0.0;
+
+	for (const x of values) {
+		stddev += pow(x - average, 2);
+	}
+
+	stddev = sqrt(stddev / (length - 1));
+
+	return stddev;
+}
+
+export { mean, pow, sqrt, exp, random, abs, log, min, max, fix, sd };

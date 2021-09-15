@@ -23,14 +23,14 @@ const TradingTester: React.FC<TradingTesterProps> = props => {
 
 	return (
 		<Root>
+			<Card marginBottom={isPriceTracking ? 16 : 0} fullWidth>
+				<AreaChart name={`[${pair}] Yield curve`} data={balanceRecordsData} height={300} fitContent />
+			</Card>
 			{isPriceTracking && (
-				<Card marginBottom={16} fullWidth>
+				<Card fullWidth>
 					<CandlestickChart name={`[${pair}] Price`} priceData={priceData} volumeData={volumeData} height={300} />
 				</Card>
 			)}
-			<Card fullWidth>
-				<AreaChart name={`[${pair}] Yield curve`} data={balanceRecordsData} height={300} fitContent />
-			</Card>
 		</Root>
 	);
 };
