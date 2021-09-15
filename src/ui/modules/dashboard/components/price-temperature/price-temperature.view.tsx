@@ -61,6 +61,10 @@ const PriceTemperature: React.FC<PriceTemperatureProps> = props => {
 				enabled: true,
 			},
 		},
+		title: {
+			text: 'Bitcoin price temperature',
+			align: 'left',
+		},
 		legend: {
 			show: false,
 		},
