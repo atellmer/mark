@@ -4,14 +4,14 @@ import { Box } from '@ui/kit/box';
 import { PriceTemperature } from '../price-temperature';
 import { FairValueDeviation } from '../fair-value-deviation';
 import { FairValueBands } from '../fair-value-bands';
+import { CycleHarmony } from '../cycle-harmony';
 
 export type DashboardEntryProps = {};
 
 const DashboardEntry: React.FC<DashboardEntryProps> = props => {
 	return (
 		<Box>
-			<FairValueDeviation />
-			<FairValueBands />;
+			<CycleHarmony />
 		</Box>
 	);
 };
