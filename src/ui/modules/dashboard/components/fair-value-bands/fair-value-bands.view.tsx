@@ -2,42 +2,42 @@ import React, { useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import moment from 'moment';
 
-import { fairValueDeviation } from '@core/trading/indicators/fair-value-deviation';
+import { fairValueBands } from '@core/trading/indicators/fair-value-bands';
 import { Bar } from '@core/trading/primitives';
 import { useTheme } from '@ui/theme';
 import { Card } from '@ui/kit/card';
 import pricesdataset from '@core/datasets/data/bars/investing/btc_usdt_d.json';
 import { Root } from './styled';
 
-export type FairValueDeviationProps = {};
+export type FairValueBandsProps = {};
 
-const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
+const FairValueBands: React.FC<FairValueBandsProps> = props => {
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
-	const deviations = useMemo(() => fairValueDeviation(bars), []);
-	const lastTime = deviations[deviations.length - 1].time;
+	const { pricePoints, middleBandPoints, topBandPoints, bottomBandPoints } = useMemo(() => fairValueBands(bars), []);
+	const lastTime = pricePoints[pricePoints.length - 1].time;
 	const shift = { x: moment.unix(lastTime).add(500, 'day').unix() * 1000, y: null };
-	const deviationSeries = [...deviations.map(x => ({ x: x.time * 1000, y: x.value })), shift];
-	const trendLineDateStart = moment('10-04-2013', 'DD-MM-YYYY').unix() * 1000;
-	const trendLineDateEnd = moment('31-12-2023', 'DD-MM-YYYY').unix() * 1000;
+	const priceSeries = [...pricePoints.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+	const middleBandSeries = [...middleBandPoints.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+	const topBandSeries = [...topBandPoints.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+	const bottomBandSeries = [...bottomBandPoints.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+
 	const series = [
 		{
-			name: 'Deviation curve',
-			data: deviationSeries,
+			name: 'Price',
+			data: priceSeries,
 		},
 		{
-			name: 'top',
-			data: [
-				{ x: trendLineDateStart, y: 910 },
-				{ x: trendLineDateEnd, y: 130 },
-			],
+			name: 'Top Band',
+			data: topBandSeries,
 		},
 		{
-			name: 'bottom',
-			data: [
-				{ x: trendLineDateStart, y: 50 },
-				{ x: trendLineDateEnd, y: 50 },
-			],
+			name: 'Middle Band',
+			data: middleBandSeries,
+		},
+		{
+			name: 'Bottom Band',
+			data: bottomBandSeries,
 		},
 	];
 
@@ -52,7 +52,7 @@ const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 			},
 		},
 		title: {
-			text: 'Fair Value',
+			text: 'Fair Value Bands',
 			align: 'left',
 		},
 		legend: {
@@ -63,13 +63,16 @@ const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 		},
 		stroke: {
 			curve: 'straight',
-			width: [3, 3, 3],
-			dashArray: [0, 4, 4],
+			width: [3, 2, 2, 2],
+			dashArray: [0, 4, 4, 4],
 		},
-		colors: ['#03A9F4', '#EF476F', '#06D6A0'],
+		colors: ['#03A9F4', '#EF476F', '#FFEB3B', '#06D6A0'],
 		grid: {
 			show: true,
 			borderColor: theme.palette.stealth,
+		},
+		yaxis: {
+			logarithmic: true,
 		},
 		xaxis: {
 			type: 'datetime',
@@ -91,4 +94,4 @@ const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 	);
 };
 
-export { FairValueDeviation };
+export { FairValueBands };

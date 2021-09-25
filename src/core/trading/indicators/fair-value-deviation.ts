@@ -2,8 +2,8 @@ import { sd, mean, fix } from '@utils/math';
 import { Bar } from '@core/trading/primitives';
 
 function fairValueDeviation(bars: Array<Bar>, period = 1200): Array<TimelineIndicatorPoint> {
-	const points: Array<TimelineIndicatorPoint> = [];
-	if (bars.length <= period) return points;
+	const deviations: Array<TimelineIndicatorPoint> = [];
+	if (bars.length <= period) return null;
 	const values = bars.map(x => x.getClose());
 
 	for (let i = period; i < values.length; i++) {
@@ -17,10 +17,10 @@ function fairValueDeviation(bars: Array<Bar>, period = 1200): Array<TimelineIndi
 			time: bars[i].getTimestamp(),
 		};
 
-		points.push(point);
+		deviations.push(point);
 	}
 
-	return points;
+	return deviations;
 }
 
 type TimelineIndicatorPoint = {

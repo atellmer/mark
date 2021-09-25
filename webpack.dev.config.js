@@ -30,7 +30,7 @@ const createConfig = function (env) {
 		devServer: {
 			contentBase: join(__dirname, 'public'),
 			compress: false,
-			port: 9001,
+			port: 9002,
 			historyApiFallback: true,
 			proxy: {
 				'/api': {
