@@ -24,6 +24,7 @@ function bitcoinCycleHarmony(bars: Array<Bar>) {
 		const t: TimelineIndicatorPoint = {
 			value: fix(fastMoving[idx] / slowMoving[idx], 6),
 			time,
+			//t: bars[i].getTime()
 		};
 
 		values.push(t);
@@ -31,6 +32,17 @@ function bitcoinCycleHarmony(bars: Array<Bar>) {
 
 	const timeA = moment('01-01-2013', BASE_TIME_FORMAT).unix();
 	const timeB = moment('01-01-2024', BASE_TIME_FORMAT).unix();
+
+	const positiveTrendline: Array<TimelineIndicatorPoint> = [
+		{
+			time: timeA,
+			value: fix(calculatePositiveTrendline(timeA), 6),
+		},
+		{
+			time: timeB,
+			value: fix(calculatePositiveTrendline(timeB), 6),
+		},
+	];
 
 	const topTrendline: Array<TimelineIndicatorPoint> = [
 		{
@@ -54,23 +66,22 @@ function bitcoinCycleHarmony(bars: Array<Bar>) {
 		},
 	];
 
-	const mainTrendline: Array<TimelineIndicatorPoint> = [
-		{
-			time: timeA,
-			value: fix((topTrendline[0].value + bottomTrendline[0].value) / 2, 6),
-		},
-		{
-			time: timeB,
-			value: fix((topTrendline[1].value + bottomTrendline[1].value) / 2, 6),
-		},
-	];
-
 	return {
 		values,
+		positiveTrendline,
 		topTrendline,
 		bottomTrendline,
-		mainTrendline,
 	};
+}
+
+function calculatePositiveTrendline(x: number) {
+	const x1 = 1396479600;
+	const y1 = 1.951353;
+	const x2 = 1526601600;
+	const y2 = 1.819714;
+	const y = (y2 - y1) * ((x - x1) / (x2 - x1)) + y1;
+
+	return y;
 }
 
 function calculateTopTrendline(x: number) {

@@ -13,11 +13,16 @@ export type CycleHarmonyProps = {};
 const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
-	const { values, topTrendline, bottomTrendline } = bitcoinCycleHarmony(bars);
+	const { values, positiveTrendline, topTrendline, bottomTrendline } = bitcoinCycleHarmony(bars);
+	const positiveTrendlineData = positiveTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
 	const topTrendlineData = topTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
 	const bottomTrendlineData = bottomTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
 	const valuesData = values.map(x => ({ x: x.time * 1000, y: x.value }));
 	const series = [
+		{
+			name: 'Positive Trendline',
+			data: positiveTrendlineData,
+		},
 		{
 			name: 'Top Trendline',
 			data: topTrendlineData,
@@ -58,10 +63,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 		},
 		stroke: {
 			curve: 'straight',
-			width: [2, 2, 2],
-			dashArray: [4, 4, 0],
+			width: [2, 2, 2, 2],
+			dashArray: [4, 4, 4, 0],
 		},
-		colors: ['#EF476F', '#06D6A0', '#03A9F4'],
+		colors: ['#fff', '#EF476F', '#06D6A0', '#03A9F4'],
 		xaxis: {
 			type: 'datetime',
 		},
