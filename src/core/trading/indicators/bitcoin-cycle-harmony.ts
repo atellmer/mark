@@ -54,16 +54,28 @@ function bitcoinCycleHarmony(bars: Array<Bar>) {
 		},
 	];
 
+	const mainTrendline: Array<TimelineIndicatorPoint> = [
+		{
+			time: timeA,
+			value: fix((topTrendline[0].value + bottomTrendline[0].value) / 2, 6),
+		},
+		{
+			time: timeB,
+			value: fix((topTrendline[1].value + bottomTrendline[1].value) / 2, 6),
+		},
+	];
+
 	return {
 		values,
 		topTrendline,
 		bottomTrendline,
+		mainTrendline,
 	};
 }
 
 function calculateTopTrendline(x: number) {
-	const x1 = 1383001200;
-	const y1 = 1.812402;
+	const x1 = 1385679600;
+	const y1 = 1.873369;
 	const x2 = 1513382400;
 	const y2 = 1.741424;
 	const y = (y2 - y1) * ((x - x1) / (x2 - x1)) + y1;

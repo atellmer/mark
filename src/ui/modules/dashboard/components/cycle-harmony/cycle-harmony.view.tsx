@@ -19,16 +19,16 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 	const valuesData = values.map(x => ({ x: x.time * 1000, y: x.value }));
 	const series = [
 		{
-			name: 'Top trendline',
+			name: 'Top Trendline',
 			data: topTrendlineData,
+		},
+		{
+			name: 'Bottom Trendline',
+			data: bottomTrendlineData,
 		},
 		{
 			name: 'Cycle harmony curve',
 			data: valuesData,
-		},
-		{
-			name: 'Bottom trendline',
-			data: bottomTrendlineData,
 		},
 	];
 
@@ -39,7 +39,7 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 		chart: {
 			background: theme.chart.candlestick.backgroundColor,
 			zoom: {
-				enabled: false,
+				enabled: true,
 			},
 		},
 		title: {
@@ -59,9 +59,9 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 		stroke: {
 			curve: 'straight',
 			width: [2, 2, 2],
-			dashArray: [4, 0, 4],
+			dashArray: [4, 4, 0],
 		},
-		colors: ['#EF476F', '#FFEB3B', '#06D6A0'],
+		colors: ['#EF476F', '#06D6A0', '#03A9F4'],
 		xaxis: {
 			type: 'datetime',
 		},
@@ -70,6 +70,88 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 				show: true,
 				format: 'dd MMM yyyy',
 			},
+		},
+		annotations: {
+			xaxis: [
+				{
+					x: new Date('9 Apr 2013').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#EF476F',
+					label: {
+						borderColor: '#EF476F',
+						style: {
+							color: '#fff',
+							background: '#EF476F',
+						},
+						text: 'middle top 2013',
+					},
+				},
+				{
+					x: new Date('29 Nov 2013').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#EF476F',
+					label: {
+						borderColor: '#EF476F',
+						style: {
+							color: '#fff',
+							background: '#EF476F',
+						},
+						text: 'top 2013',
+					},
+				},
+				{
+					x: new Date('14 Jan 2015').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#06D6A0',
+					label: {
+						borderColor: '#06D6A0',
+						style: {
+							color: '#fff',
+							background: '#06D6A0',
+						},
+						text: 'bottom 2015',
+					},
+				},
+				{
+					x: new Date('16 Dec 2017').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#EF476F',
+					label: {
+						borderColor: '#EF476F',
+						style: {
+							color: '#fff',
+							background: '#EF476F',
+						},
+						text: 'top 2017',
+					},
+				},
+				{
+					x: new Date('15 Dec 2018').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#06D6A0',
+					label: {
+						borderColor: '#06D6A0',
+						style: {
+							color: '#fff',
+							background: '#06D6A0',
+						},
+						text: 'bottom 2018',
+					},
+				},
+				{
+					x: new Date('13 Apr 2021').getTime(),
+					strokeDashArray: 0,
+					borderColor: '#EF476F',
+					label: {
+						borderColor: '#EF476F',
+						style: {
+							color: '#fff',
+							background: '#EF476F',
+						},
+						text: 'middle top 2021',
+					},
+				},
+			],
 		},
 	};
 
