@@ -51,9 +51,9 @@ function fairValueBands(bars: Array<Bar>, period = 1200): IndicatorValue {
 
 function maxTopDeviationPercent(x: number) {
 	const x1 = 1385593200;
-	const y1 = 772.66;
+	const y1 = 859.55;
 	const x2 = 1512604800;
-	const y2 = 521.21;
+	const y2 = 572.92;
 	const y = (y2 - y1) * ((x - x1) / (x2 - x1)) + y1;
 
 	return y;

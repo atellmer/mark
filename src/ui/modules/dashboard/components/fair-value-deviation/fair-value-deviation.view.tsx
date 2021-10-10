@@ -14,30 +14,24 @@ export type FairValueDeviationProps = {};
 const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
-	const deviations = useMemo(() => fairValueDeviation(bars), []);
+	const { deviations, topTrendline, bottomTrendline } = useMemo(() => fairValueDeviation(bars), []);
 	const lastTime = deviations[deviations.length - 1].time;
 	const shift = { x: moment.unix(lastTime).add(500, 'day').unix() * 1000, y: null };
 	const deviationSeries = [...deviations.map(x => ({ x: x.time * 1000, y: x.value })), shift];
-	const trendLineDateStart = moment('10-04-2013', 'DD-MM-YYYY').unix() * 1000;
-	const trendLineDateEnd = moment('31-12-2023', 'DD-MM-YYYY').unix() * 1000;
+	const topTrendlineData = [...topTrendline.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+	const bottomTrendlineData = [...bottomTrendline.map(x => ({ x: x.time * 1000, y: x.value })), shift];
 	const series = [
 		{
-			name: 'Deviation curve',
-			data: deviationSeries,
-		},
-		{
 			name: 'top',
-			data: [
-				{ x: trendLineDateStart, y: 910 },
-				{ x: trendLineDateEnd, y: 130 },
-			],
+			data: topTrendlineData,
 		},
 		{
 			name: 'bottom',
-			data: [
-				{ x: trendLineDateStart, y: 50 },
-				{ x: trendLineDateEnd, y: 50 },
-			],
+			data: bottomTrendlineData,
+		},
+		{
+			name: 'Deviation curve',
+			data: deviationSeries,
 		},
 	];
 
@@ -64,9 +58,9 @@ const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 		stroke: {
 			curve: 'straight',
 			width: [3, 3, 3],
-			dashArray: [0, 4, 4],
+			dashArray: [4, 4, 0],
 		},
-		colors: ['#03A9F4', '#EF476F', '#06D6A0'],
+		colors: ['#EF476F', '#06D6A0', '#03A9F4'],
 		grid: {
 			show: true,
 			borderColor: theme.palette.stealth,
