@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
-import moment from 'moment';
 
 import { fairValueDeviation } from '@core/trading/indicators/fair-value-deviation';
 import { Bar } from '@core/trading/primitives';
@@ -15,11 +14,9 @@ const FairValueDeviation: React.FC<FairValueDeviationProps> = props => {
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
 	const { deviations, topTrendline, bottomTrendline } = useMemo(() => fairValueDeviation(bars), []);
-	const lastTime = deviations[deviations.length - 1].time;
-	const shift = { x: moment.unix(lastTime).add(500, 'day').unix() * 1000, y: null };
-	const deviationSeries = [...deviations.map(x => ({ x: x.time * 1000, y: x.value })), shift];
-	const topTrendlineData = [...topTrendline.map(x => ({ x: x.time * 1000, y: x.value })), shift];
-	const bottomTrendlineData = [...bottomTrendline.map(x => ({ x: x.time * 1000, y: x.value })), shift];
+	const deviationSeries = deviations.map(x => ({ x: x.time * 1000, y: x.value }));
+	const topTrendlineData = topTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
+	const bottomTrendlineData = bottomTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
 	const series = [
 		{
 			name: 'top',

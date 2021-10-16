@@ -25,7 +25,7 @@ function fairValueDeviation(bars: Array<Bar>, period = 1200): IndicatorValue {
 		deviations.push(point);
 	}
 
-	const timeA = moment('01-01-2013', BASE_TIME_FORMAT).unix();
+	const timeA = moment('29-10-2013', BASE_TIME_FORMAT).unix();
 	const timeB = moment('01-01-2024', BASE_TIME_FORMAT).unix();
 
 	const topTrendline: Array<TimelineIndicatorPoint> = [
