@@ -38,7 +38,7 @@ function fix(x: number, precision = 4): number {
 	return Number(x.toFixed(precision));
 }
 
-function sd(values: Array<number>) {
+function sd(values: Array<number>): number {
 	const length = values.length;
 	if (length === 1) return values[0];
 	const average = mean(values);
@@ -53,4 +53,30 @@ function sd(values: Array<number>) {
 	return stddev;
 }
 
-export { mean, pow, sqrt, exp, random, abs, log, min, max, fix, sd };
+function minimax(values: Array<number>, interval: [number, number]): Array<number> {
+	const a = interval[0];
+	const b = interval[1];
+	const xMin = min(values);
+	const xMax = max(values);
+	const normal = [];
+
+	for (let i = 0; i < values.length; i++) {
+		normal[i] = fix(a + ((values[i] - xMin) / (xMax - xMin)) * (b - a), 4);
+	}
+
+	return normal;
+}
+
+function zscore(values: Array<number>) {
+	const average = mean(values);
+	const stdev = sd(values);
+	const normal = [];
+
+	for (let i = 0; i < values.length; i++) {
+		normal[i] = fix((values[i] - average) / stdev, 4);
+	}
+
+	return normal;
+}
+
+export { mean, pow, sqrt, exp, random, abs, log, min, max, fix, sd, minimax, zscore };

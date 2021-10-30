@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import moment from 'moment';
 
-import { bitcoinCycleHarmony } from '@core/trading/indicators/bitcoin-cycle-harmony';
+import { risk } from '@core/trading/indicators/risk';
 import { Bar } from '@core/trading/primitives';
 import { Card } from '@ui/kit/card';
 import { useTheme } from '@ui/theme';
@@ -10,31 +11,21 @@ import pricesdataset from '@core/datasets/data/bars/investing/btc_usdt_d.json';
 
 export type CycleHarmonyProps = {};
 
-const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
+const Risk: React.FC<CycleHarmonyProps> = props => {
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
-	const { values, positiveTrendline, topTrendline, bottomTrendline } = bitcoinCycleHarmony(bars);
-	const positiveTrendlineData = positiveTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
-	const topTrendlineData = topTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
-	const bottomTrendlineData = bottomTrendline.map(x => ({ x: x.time * 1000, y: x.value }));
+	const { values, band } = risk(bars);
 	const valuesData = values.map(x => ({ x: x.time * 1000, y: x.value }));
+	const bandData = band.map(x => ({ x: x.time * 1000, y: x.value }));
 	const series = [
 		{
-			name: 'Positive Trendline',
-			data: positiveTrendlineData,
-		},
-		{
-			name: 'Top Trendline',
-			data: topTrendlineData,
-		},
-		{
-			name: 'Bottom Trendline',
-			data: bottomTrendlineData,
-		},
-		{
-			name: 'Cycle harmony curve',
+			name: 'Risk',
 			data: valuesData,
 		},
+		// {
+		// 	name: 'Band',
+		// 	data: bandData,
+		// },
 	];
 
 	const options = {
@@ -48,7 +39,7 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 			},
 		},
 		title: {
-			text: 'Bitcoin cycle harmony',
+			text: 'Bitcoin risk',
 			align: 'left',
 		},
 		legend: {
@@ -63,10 +54,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 		},
 		stroke: {
 			curve: 'straight',
-			width: [2, 2, 2, 2],
-			dashArray: [4, 4, 4, 0],
+			width: [2],
+			dashArray: [0],
 		},
-		colors: ['#fff', '#EF476F', '#06D6A0', '#03A9F4'],
+		colors: ['#fff'],
 		xaxis: {
 			type: 'datetime',
 		},
@@ -74,6 +65,12 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 			x: {
 				show: true,
 				format: 'dd MMM yyyy',
+				// formatter: x => {
+				// 	const date = moment(new Date(x)).format('DD MMMM YYYY');
+
+				// 	console.log(`${date}: ${x}`);
+				// 	return date;
+				// },
 			},
 		},
 		annotations: {
@@ -83,10 +80,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#EF476F',
 					label: {
-						borderColor: '#EF476F',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#EF476F',
+							background: 'transparent',
 						},
 						text: 'middle top 2013',
 					},
@@ -96,10 +93,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#EF476F',
 					label: {
-						borderColor: '#EF476F',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#EF476F',
+							background: 'transparent',
 						},
 						text: 'top 2013',
 					},
@@ -109,10 +106,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#06D6A0',
 					label: {
-						borderColor: '#06D6A0',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#06D6A0',
+							background: 'transparent',
 						},
 						text: 'bottom 2015',
 					},
@@ -122,10 +119,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#EF476F',
 					label: {
-						borderColor: '#EF476F',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#EF476F',
+							background: 'transparent',
 						},
 						text: 'top 2017',
 					},
@@ -135,10 +132,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#06D6A0',
 					label: {
-						borderColor: '#06D6A0',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#06D6A0',
+							background: 'transparent',
 						},
 						text: 'bottom 2018',
 					},
@@ -148,10 +145,10 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 					strokeDashArray: 0,
 					borderColor: '#EF476F',
 					label: {
-						borderColor: '#EF476F',
+						borderColor: 'transparent',
 						style: {
 							color: '#fff',
-							background: '#EF476F',
+							background: 'transparent',
 						},
 						text: 'middle top 2021',
 					},
@@ -169,4 +166,4 @@ const CycleHarmony: React.FC<CycleHarmonyProps> = props => {
 	);
 };
 
-export { CycleHarmony };
+export { Risk };
