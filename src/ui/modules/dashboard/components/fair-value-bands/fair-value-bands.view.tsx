@@ -9,9 +9,12 @@ import { Card } from '@ui/kit/card';
 import pricesdataset from '@core/datasets/data/bars/investing/btc_usdt_d.json';
 import { Root } from './styled';
 
-export type FairValueBandsProps = {};
+export type FairValueBandsProps = {
+	logarithmic?: boolean;
+};
 
 const FairValueBands: React.FC<FairValueBandsProps> = props => {
+	const { logarithmic = false } = props;
 	const { theme } = useTheme();
 	const bars = useMemo(() => Bar.fromJSON(pricesdataset), []);
 	const { pricePoints, middleBandPoints, topBandPoints, bottomBandPoints } = useMemo(() => fairValueBands(bars), []);
@@ -72,7 +75,7 @@ const FairValueBands: React.FC<FairValueBandsProps> = props => {
 			borderColor: theme.palette.stealth,
 		},
 		yaxis: {
-			logarithmic: true,
+			logarithmic,
 		},
 		xaxis: {
 			type: 'datetime',
