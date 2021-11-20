@@ -45,7 +45,7 @@ const BalancesDivergence: React.FC<BalancesDivergenceProps> = props => {
 				}),
 			},
 			{
-				name: 'Whales Sell and Fishes Sell',
+				name: 'Whales Sell and Fishes Down',
 				data: balancesDivergence.map(x => {
 					return {
 						x: x.time,
