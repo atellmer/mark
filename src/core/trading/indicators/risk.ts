@@ -2,7 +2,6 @@ import regression from 'regression';
 
 import { fix, minimax, mean, sd } from '@utils/math';
 import { Bar } from '@core/trading/primitives';
-import { sma } from './moving-average';
 
 type TimelineIndicatorPoint = {
 	value: number;

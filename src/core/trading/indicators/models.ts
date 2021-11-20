@@ -1,4 +1,9 @@
-export type TimelineIndicatorPoint = {
+import { TimeUnix } from '@core/api/onchain/models';
+
+export type TimePoint = {
+	time: TimeUnix;
+	date: Date;
 	value: number;
-	time: number;
 };
+
+export { TimeUnix };

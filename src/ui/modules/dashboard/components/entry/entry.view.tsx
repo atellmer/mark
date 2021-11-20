@@ -6,18 +6,20 @@ import { FairValueDeviation } from '../fair-value-deviation';
 import { FairValueBands } from '../fair-value-bands';
 import { Risk } from '../risk';
 import { MacroCycleHarmony } from '../macro-cycle-harmony';
+import { BalancesDivergence } from '../balances-divergence';
 
 export type DashboardEntryProps = {};
 
 const DashboardEntry: React.FC<DashboardEntryProps> = props => {
 	return (
 		<Box>
-			<PriceTemperature />
+			{/* <PriceTemperature />
 			<Risk />
 			<FairValueDeviation />
 			<FairValueBands />
 			<FairValueBands logarithmic />
-			<MacroCycleHarmony />
+			<MacroCycleHarmony /> */}
+			<BalancesDivergence />
 		</Box>
 	);
 };
