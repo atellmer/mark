@@ -31,4 +31,12 @@ function createListFromMap<T = any>(map: Record<string, T> = {}): Array<T> {
 	return Object.keys(map).reduce((acc, key) => (acc.push(map[key]), acc), []);
 }
 
-export { detectIsFunction, detectIsUndefined, groupBy, createObjectMap, createListFromMap };
+function fillEnd(str: string, size: number, value: string) {
+	while (str.length < size) {
+		str += value;
+	}
+
+	return str;
+}
+
+export { detectIsFunction, detectIsUndefined, groupBy, createObjectMap, createListFromMap, fillEnd };

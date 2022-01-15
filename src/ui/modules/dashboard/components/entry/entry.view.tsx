@@ -13,13 +13,13 @@ export type DashboardEntryProps = {};
 const DashboardEntry: React.FC<DashboardEntryProps> = props => {
 	return (
 		<Box>
-			{/* <PriceTemperature />
+			<BalancesDivergence />
+			<PriceTemperature />
 			<Risk />
 			<FairValueDeviation />
 			<FairValueBands />
 			<FairValueBands logarithmic />
-			<MacroCycleHarmony /> */}
-			<BalancesDivergence />
+			<MacroCycleHarmony />
 		</Box>
 	);
 };
