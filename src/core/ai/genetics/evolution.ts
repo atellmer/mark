@@ -2,77 +2,90 @@ import { random } from '@utils/math';
 import { Chromosome } from './chromosome';
 
 type EvolutionOptions = {
+	variant: 'maximization' | 'minimization';
 	poolSize: number;
 	chromosomeSize: number;
-	maxIterations?: number;
+	maxIterations: number;
 	searchSpace?: [number, number];
 	mutationProb?: number;
 	crossProb?: number;
-	fitness: (parameters: Array<number>) => number;
+	fitness: (parameters: Array<number>) => number | Promise<number>;
 };
 
-function evolution(options: EvolutionOptions): Array<number> {
+function evolution(options: EvolutionOptions): Promise<Array<number>> {
 	const {
+		variant,
 		poolSize,
 		chromosomeSize,
-		maxIterations = Infinity,
+		maxIterations,
 		searchSpace = [0, Number.MAX_SAFE_INTEGER],
 		mutationProb = 0.1,
 		crossProb = 0.5,
 		fitness,
 	} = options;
-	let population: Array<Chromosome> = fill({
-		population: [],
+	const isMaxi = variant === 'maximization';
+	let chromosomes: Array<Chromosome> = fill({
+		chromosomes: [],
 		chromosomeSize,
 		poolSize,
 		searchSpace,
 	});
 	let results: Array<FitnessResult> = [];
 	let best: Chromosome = null;
-	let minDistance = Infinity;
+	let bestResult = isMaxi ? -Infinity : Infinity;
 
 	function iteration() {
-		for (const chromosome of population) {
-			const distance = fitness(Chromosome.decode(chromosome.getGenes()));
+		return new Promise(async resolve => {
+			for (const chromosome of chromosomes) {
+				const result = await fitness(Chromosome.decode(chromosome.getGenes()));
 
-			if (distance < minDistance) {
-				minDistance = distance;
+				if (isMaxi) {
+					if (result > bestResult) {
+						bestResult = result;
+					}
+				} else {
+					if (result < bestResult) {
+						bestResult = result;
+					}
+				}
+
+				results.push({ result, chromosome });
 			}
 
-			results.push({ distance, chromosome });
-		}
+			chromosomes = [];
 
-		population = [];
+			results.sort(isMaxi ? maxToMin : minToMax);
 
-		results.sort((a, b) => a.distance - b.distance);
+			best = Chromosome.clone(results[0].chromosome);
 
-		best = Chromosome.clone(results[0].chromosome);
+			if (!isMaxi && bestResult === 0) {
+				resolve(true);
+			}
 
-		if (minDistance === 0) return true;
+			chromosomes.push(best, ...mutate(cross(survive(results), crossProb), mutationProb));
 
-		population.push(best, ...mutate(cross(survive(results), crossProb), mutationProb));
+			chromosomes = fill({
+				chromosomes,
+				chromosomeSize,
+				poolSize,
+				searchSpace,
+			});
 
-		population = fill({
-			population,
-			chromosomeSize,
-			poolSize,
-			searchSpace,
+			results = [];
+
+			resolve(false);
 		});
-
-		results = [];
-
-		return false;
 	}
 
-	for (let i = 0; i < maxIterations; i++) {
-		if (iteration()) {
-			break;
+	return new Promise(async resolve => {
+		for (let i = 0; i < maxIterations; i++) {
+			const stop = await iteration();
+
+			if (stop) break;
 		}
-	}
 
-	const parameters = Chromosome.decode(best.getGenes());
-
-	return parameters;
+		resolve(Chromosome.decode(best.getGenes()));
+	});
 }
 
 function survive(results: Array<FitnessResult>): Array<Chromosome> {
@@ -108,29 +121,33 @@ function cross(chromosomes: Array<Chromosome>, prob: number): Array<Chromosome> 
 }
 
 type CompleteOptions = {
-	population: Array<Chromosome>;
+	chromosomes: Array<Chromosome>;
 } & Pick<EvolutionOptions, 'poolSize' | 'searchSpace' | 'chromosomeSize'>;
 
 function fill(options: CompleteOptions) {
-	const { population, poolSize, searchSpace, chromosomeSize } = options;
+	const { chromosomes, poolSize, searchSpace, chromosomeSize } = options;
 	const [minValue, maxValue] = searchSpace;
 
-	while (population.length < poolSize) {
+	while (chromosomes.length < poolSize) {
 		const source = [];
 
 		for (let j = 0; j < chromosomeSize; j++) {
 			source.push(random(minValue > 0 ? minValue : 0, maxValue));
 		}
 
-		population.push(new Chromosome(source));
+		chromosomes.push(new Chromosome(source));
 	}
 
-	return population;
+	return chromosomes;
 }
 
 type FitnessResult = {
-	distance: number;
+	result: number;
 	chromosome: Chromosome;
 };
+
+const maxToMin = (a: FitnessResult, b: FitnessResult) => (a.result - b.result > 0 ? -1 : 1);
+
+const minToMax = (a: FitnessResult, b: FitnessResult) => (a.result - b.result > 0 ? 1 : -1);
 
 export { evolution };
