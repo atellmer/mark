@@ -62,7 +62,7 @@ function evolution(options: EvolutionOptions): Promise<Array<number>> {
 				resolve(true);
 			}
 
-			chromosomes.push(best, ...mutate(cross(survive(results), crossProb), mutationProb));
+			chromosomes.push(best, ...mutate(cross(survive(results), crossProb, poolSize), mutationProb));
 
 			chromosomes = fill({
 				chromosomes,
@@ -89,7 +89,9 @@ function evolution(options: EvolutionOptions): Promise<Array<number>> {
 }
 
 function survive(results: Array<FitnessResult>): Array<Chromosome> {
-	results.splice(Math.round(results.length / 2));
+	const kill = Math.round(results.length / 4);
+
+	results.splice(kill);
 
 	return results.map(x => x.chromosome);
 }
@@ -104,10 +106,12 @@ function mutate(chromosomes: Array<Chromosome>, prob: number): Array<Chromosome>
 	return chromosomes;
 }
 
-function cross(chromosomes: Array<Chromosome>, prob: number): Array<Chromosome> {
+function cross(chromosomes: Array<Chromosome>, prob: number, poolSize: number): Array<Chromosome> {
 	const children: Array<Chromosome> = [];
+	const over = 2;
 
 	for (const chromosome of chromosomes) {
+		if (chromosomes.length + children.length + over >= poolSize) break;
 		if (random(0, 1) <= prob) {
 			const idx = Math.round(random(0, chromosomes.length - 1));
 

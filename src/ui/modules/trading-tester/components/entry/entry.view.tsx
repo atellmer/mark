@@ -7,8 +7,8 @@ import { TradingTester } from '../tester';
 	const [x, y, z, n] = await evolution({
 		variant: 'minimization',
 		chromosomeSize: 4,
-		maxIterations: Infinity,
-		poolSize: 10000,
+		maxIterations: 100,
+		poolSize: 1000,
 		searchSpace: [0, 100],
 		fitness: ([x, y, z, n]) =>
 			x > 1 && y > 1 && z > 1 && n > 1 && n < 10
@@ -18,19 +18,25 @@ import { TradingTester } from '../tester';
 
 	console.log('minimization');
 	console.log('source', `x ^ n + y ^ n = z ^ n`);
-	console.log('formula', `${x} ^ ${n} + ${y} ^ ${n} = ${z} ^ ${n} (${Math.pow(z, n)})`);
+	console.log(
+		'formula',
+		`${x} ^ ${n} + ${y} ^ ${n} = ${z} ^ ${n} (${Math.pow(x, n) + Math.pow(y, n)} = ${Math.pow(z, n)})`,
+	);
 	console.log(x, y, z, n);
 
-	const [x1, y1] = await evolution({
-		variant: 'maximization',
-		chromosomeSize: 2,
-		maxIterations: 10,
-		poolSize: 10000,
-		searchSpace: [0, 1000],
-		fitness: ([x, y]) => x + y,
-	});
+	// const [x1, y1] = await evolution({
+	// 	variant: 'maximization',
+	// 	chromosomeSize: 2,
+	// 	maxIterations: 100,
+	// 	poolSize: 10000,
+	// 	searchSpace: [0, 1000],
+	// 	fitness: ([x, y]) =>
+	// 		new Promise(resolve => {
+	// 			resolve(x + y);
+	// 		}),
+	// });
 
-	console.log('maximization', x1, y1);
+	// console.log('maximization', x1, y1);
 })();
 
 export type TradingTesterEntryProps = {};
