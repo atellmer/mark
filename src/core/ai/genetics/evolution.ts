@@ -1,157 +1,173 @@
-import { random } from '@utils/math';
+import { random, randomInt, mean, fix } from '@utils/math';
 import { Chromosome } from './chromosome';
 
 type EvolutionOptions = {
-	variant: 'maximization' | 'minimization';
 	poolSize: number;
 	chromosomeSize: number;
-	maxIterations: number;
-	searchSpace?: [number, number];
+	maxGenerations: number;
+	searchSpace: [number, number];
+	precision: number;
 	mutationProb?: number;
 	crossProb?: number;
+	enableLogging?: boolean;
 	fitness: (parameters: Array<number>) => number | Promise<number>;
 };
 
 function evolution(options: EvolutionOptions): Promise<Array<number>> {
 	const {
-		variant,
 		poolSize,
 		chromosomeSize,
-		maxIterations,
-		searchSpace = [0, Number.MAX_SAFE_INTEGER],
-		mutationProb = 0.1,
-		crossProb = 0.5,
-		fitness,
-	} = options;
-	const isMaxi = variant === 'maximization';
-	let chromosomes: Array<Chromosome> = fill({
-		chromosomes: [],
-		chromosomeSize,
-		poolSize,
+		maxGenerations,
 		searchSpace,
+		precision,
+		mutationProb = 0.1,
+		crossProb = 0.9,
+		fitness,
+		enableLogging,
+	} = options;
+	let population: Array<Chromosome> = fill({
+		population: [],
+		chromosomeSize,
+		poolSize,
+		precision,
 	});
-	let results: Array<FitnessResult> = [];
-	let best: Chromosome = null;
-	let bestResult = isMaxi ? -Infinity : Infinity;
+	const intervals = getIntervals(searchSpace, precision);
+	let minScore = Infinity;
+	let avgScore = Infinity;
+	let alfa: Chromosome = null;
+
+	function log(...args) {
+		if (!enableLogging) return;
+
+		console.log(...args);
+	}
 
 	function iteration() {
 		return new Promise(async resolve => {
-			for (const chromosome of chromosomes) {
-				const result = await fitness(Chromosome.decode(chromosome.getGenes()));
+			for (const chromosome of population) {
+				const score = await fitness(getParameters(Chromosome.decode(chromosome.getGenes()), intervals));
 
-				if (isMaxi) {
-					if (result > bestResult) {
-						bestResult = result;
-					}
-				} else {
-					if (result < bestResult) {
-						bestResult = result;
-					}
+				if (score < minScore) {
+					minScore = score;
+					alfa = chromosome;
 				}
 
-				results.push({ result, chromosome });
+				chromosome.setScore(score);
 			}
 
-			chromosomes = [];
+			alfa = Chromosome.clone(alfa);
+			avgScore = mean(population.map(x => x.getScore()));
 
-			results.sort(isMaxi ? maxToMin : minToMax);
+			if (minScore === 0) return resolve(true);
 
-			best = Chromosome.clone(results[0].chromosome);
-
-			if (!isMaxi && bestResult === 0) {
-				resolve(true);
-			}
-
-			chromosomes.push(best, ...mutate(cross(survive(results), crossProb, poolSize), mutationProb));
-
-			chromosomes = fill({
-				chromosomes,
+			population = fill({
+				population: mutate(cross(select(population, avgScore, poolSize), crossProb), precision, mutationProb),
 				chromosomeSize,
 				poolSize,
-				searchSpace,
+				precision,
 			});
-
-			results = [];
 
 			resolve(false);
 		});
 	}
 
 	return new Promise(async resolve => {
-		for (let i = 0; i < maxIterations; i++) {
+		for (let i = 0; i < maxGenerations; i++) {
 			const stop = await iteration();
+			log('generation #: ', i + 1);
+			log('min score: ', minScore);
+			log('avg score: ', avgScore);
 
 			if (stop) break;
 		}
 
-		resolve(Chromosome.decode(best.getGenes()));
+		resolve(getParameters(Chromosome.decode(alfa.getGenes()), intervals));
 	});
 }
 
-function survive(results: Array<FitnessResult>): Array<Chromosome> {
-	const kill = Math.round(results.length / 4);
+function getParameters(values: Array<number>, intervals: Array<number>) {
+	const parameters = values.map(x => intervals[x]);
 
-	results.splice(kill);
-
-	return results.map(x => x.chromosome);
+	return parameters;
 }
 
-function mutate(chromosomes: Array<Chromosome>, prob: number): Array<Chromosome> {
-	for (const chromosome of chromosomes) {
-		if (random(0, 1) <= prob) {
-			chromosome.mutate();
+function getIntervals(space: [number, number], precision: number) {
+	const intervals: Array<number> = [];
+	const [min, max] = space;
+	const step = (Math.abs(min) + Math.abs(max)) / precision;
+
+	for (let i = min; i <= max; i += step) {
+		intervals.push(fix(i, 5));
+	}
+
+	return intervals;
+}
+
+function select(population: Array<Chromosome>, avgScore: number, poolSize: number) {
+	const selected = [];
+
+	for (const x of population) {
+		if (x.getScore() < avgScore) {
+			selected.push(x);
 		}
 	}
 
-	return chromosomes;
+	return selected.slice(0, poolSize);
 }
 
-function cross(chromosomes: Array<Chromosome>, prob: number, poolSize: number): Array<Chromosome> {
+function mutate(population: Array<Chromosome>, precision: number, prob: number): Array<Chromosome> {
+	for (const x of population) {
+		if (random(0, 1) <= prob) {
+			x.mutate(precision);
+		}
+	}
+
+	return population;
+}
+
+function cross(population: Array<Chromosome>, prob: number): Array<Chromosome> {
 	const children: Array<Chromosome> = [];
-	const over = 2;
 
-	for (const chromosome of chromosomes) {
-		if (chromosomes.length + children.length + over >= poolSize) break;
-		if (random(0, 1) <= prob) {
-			const idx = Math.round(random(0, chromosomes.length - 1));
+	for (const x of population) {
+		if (random(0, 1) <= prob && population.length >= 2) {
+			const y = selectCrossPartner(x, population);
 
-			children.push(...Chromosome.cross(chromosome, chromosomes[idx]));
+			children.push(Chromosome.cross(x, y));
 		}
 	}
 
-	chromosomes.push(...children);
+	population.push(...children);
 
-	return chromosomes;
+	return population;
+}
+
+function selectCrossPartner(x: Chromosome, population: Array<Chromosome>) {
+	const idx = randomInt(0, population.length - 1);
+	const y = population[idx];
+
+	if (x === y) return selectCrossPartner(x, population);
+
+	return y;
 }
 
 type CompleteOptions = {
-	chromosomes: Array<Chromosome>;
-} & Pick<EvolutionOptions, 'poolSize' | 'searchSpace' | 'chromosomeSize'>;
+	population: Array<Chromosome>;
+} & Pick<EvolutionOptions, 'poolSize' | 'precision' | 'chromosomeSize'>;
 
 function fill(options: CompleteOptions) {
-	const { chromosomes, poolSize, searchSpace, chromosomeSize } = options;
-	const [minValue, maxValue] = searchSpace;
+	const { population, poolSize, precision, chromosomeSize } = options;
 
-	while (chromosomes.length < poolSize) {
+	while (population.length < poolSize) {
 		const source = [];
 
 		for (let j = 0; j < chromosomeSize; j++) {
-			source.push(random(minValue > 0 ? minValue : 0, maxValue));
+			source.push(randomInt(0, precision));
 		}
 
-		chromosomes.push(new Chromosome(source));
+		population.push(new Chromosome(source));
 	}
 
-	return chromosomes;
+	return population;
 }
-
-type FitnessResult = {
-	result: number;
-	chromosome: Chromosome;
-};
-
-const maxToMin = (a: FitnessResult, b: FitnessResult) => (a.result - b.result > 0 ? -1 : 1);
-
-const minToMax = (a: FitnessResult, b: FitnessResult) => (a.result - b.result > 0 ? 1 : -1);
 
 export { evolution };

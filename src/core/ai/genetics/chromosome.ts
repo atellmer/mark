@@ -1,62 +1,57 @@
-import { random } from '@utils/math';
-import { fillEnd } from '@utils/helpers';
+import { random, randomInt } from '@utils/math';
 import { Gene } from './gene';
 
 class Chromosome {
 	private genes: Array<Gene>;
+	private score = Infinity;
 
 	constructor(source: Array<number>) {
 		this.genes = source.map(x => new Gene(x));
-	}
-
-	public mutate() {
-		const idx = Math.round(random(0, this.genes.length - 1));
-		const gene = this.genes[idx];
-
-		gene.mutate();
 	}
 
 	public getGenes(): Array<Gene> {
 		return this.genes;
 	}
 
+	public getSize(): number {
+		return this.genes.length;
+	}
+
+	public getScore(): number {
+		return this.score;
+	}
+
+	public setScore(score: number) {
+		this.score = score;
+	}
+
+	public mutate(precision: number) {
+		const idx = randomInt(0, this.genes.length - 1);
+		const gene = this.genes[idx];
+
+		gene.mutate(precision);
+	}
+
 	static decode(genes: Array<Gene>): Array<number> {
-		return genes.map(x => Gene.decode(x.getValue()));
+		return genes.map(x => x.getValue());
 	}
 
 	static clone(chromosome: Chromosome): Chromosome {
 		return new Chromosome(Chromosome.decode(chromosome.getGenes()));
 	}
 
-	static cross(chromosomeOne: Chromosome, chromosomeTwo: Chromosome): [Chromosome, Chromosome] {
-		const setOne = chromosomeOne.getGenes().map(x => x.getValue().join(''));
-		const setTwo = chromosomeTwo.getGenes().map(x => x.getValue().join(''));
-		const childSourceOne: Array<string> = [];
-		const childSourceTwo: Array<string> = [];
+	static cross(x: Chromosome, y: Chromosome): Chromosome {
+		const sourceOne = Chromosome.decode(x.getGenes());
+		const sourceTwo = Chromosome.decode(y.getGenes());
+		const idx = randomInt(0, x.getSize() - 1);
+		const sliceLeftOne = sourceOne.slice(0, idx);
+		const sliceRightOne = sourceOne.slice(idx, sourceOne.length);
+		const sliceLeftTwo = sourceTwo.slice(0, idx);
+		const sliceRightTwo = sourceTwo.slice(idx, sourceTwo.length);
 
-		for (let i = 0; i < setOne.length; i++) {
-			let valueOne = setOne[i];
-			let valueTwo = setTwo[i];
-
-			const size = valueOne.length > valueTwo.length ? valueOne.length : valueTwo.length;
-			const idx = Math.round(random(0, size - 1));
-
-			valueOne = fillEnd(valueOne, size, '0');
-			valueTwo = fillEnd(valueTwo, size, '0');
-
-			const sliceLeftOne = valueOne.slice(0, idx);
-			const sliceRightOne = valueOne.slice(idx, valueOne.length);
-			const sliceLeftTwo = valueTwo.slice(0, idx);
-			const sliceRightTwo = valueTwo.slice(idx, valueTwo.length);
-
-			childSourceOne.push(sliceLeftOne + sliceRightTwo);
-			childSourceTwo.push(sliceLeftTwo + sliceRightOne);
-		}
-
-		const childChromosomeOne = new Chromosome(childSourceOne.map(x => Gene.decode(x.split(''))));
-		const childChromosomeTwo = new Chromosome(childSourceTwo.map(x => Gene.decode(x.split(''))));
-
-		return [childChromosomeOne, childChromosomeTwo];
+		return random(0, 1) <= 0.5
+			? new Chromosome([...sliceLeftOne, ...sliceRightTwo])
+			: new Chromosome([...sliceLeftTwo, ...sliceRightOne]);
 	}
 }
 

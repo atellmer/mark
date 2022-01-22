@@ -18,6 +18,10 @@ function random(min: number, max: number) {
 	return Math.random() * (max - min) + min;
 }
 
+function randomInt(min: number, max: number) {
+	return Math.round(random(min, max));
+}
+
 function abs(x: number): number {
 	return Math.abs(x);
 }
@@ -79,4 +83,14 @@ function zscore(values: Array<number>) {
 	return normal;
 }
 
-export { mean, pow, sqrt, exp, random, abs, log, min, max, fix, sd, minimax, zscore };
+function sum(values: Array<number>) {
+	let total = 0;
+
+	for (const value of values) {
+		total += value;
+	}
+
+	return total;
+}
+
+export { mean, pow, sqrt, exp, random, randomInt, abs, log, min, max, fix, sd, minimax, zscore, sum };

@@ -1,45 +1,35 @@
-import { random } from '@utils/math';
+import { randomInt } from '@utils/math';
 
 class Gene {
-	private source: number;
-	private value: Array<string>;
+	private value: number;
 
 	constructor(source: number) {
-		this.source = source;
-		this.value = Gene.encode(source);
+		this.value = source;
 	}
 
-	public getSource(): number {
-		return this.source;
-	}
-
-	public getValue(): Array<string> {
+	public getValue(): number {
 		return this.value;
 	}
 
-	public mutate() {
-		const idx = Math.round(random(0, this.value.length - 1));
-		const value = Number(this.value[idx]);
-		const mutated = value === 1 ? 0 : 1;
+	public mutate(precision: number) {
+		const bin = encodeBinary(this.value).split('');
+		const idx = randomInt(0, bin.length - 1);
 
-		this.value[idx] = mutated.toString();
-		this.source = Gene.decode(this.value);
-	}
+		bin[idx] = bin[idx] === '1' ? '0' : '1';
 
-	static encode(source: number): Array<string> {
-		return encodeBin(source).split('');
-	}
+		const newValue = decodeBinary(bin.join(''));
 
-	static decode(value: Array<string>): number {
-		return decodeBin(value.join(''));
+		if (newValue >= 0 && newValue <= precision) {
+			this.value = newValue;
+		}
 	}
 }
 
-function encodeBin(value: number): string {
-	return (value >>> 0).toString(2);
+function encodeBinary(value: number): string {
+	return value.toString(2);
 }
 
-function decodeBin(value: string): number {
+function decodeBinary(value: string): number {
 	return parseInt(value, 2);
 }
 
