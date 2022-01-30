@@ -1,4 +1,4 @@
-import { randomInt, random } from '@utils/math';
+import { randomInt } from '@utils/math';
 import { AbstractMetaNode, MetaContext } from './shared';
 
 class ConstantNode extends AbstractMetaNode {
@@ -44,16 +44,6 @@ class ConstantNode extends AbstractMetaNode {
 	public static createRandomNode() {
 		const { searchSpace } = MetaContext.extract();
 		const [min, max] = searchSpace;
-		const idx = Math.abs(randomInt(min, max));
-
-		if (idx === (Math.trunc(min) + Math.trunc(max)) / 2) {
-			const constant = [Math.PI, Math.E];
-			const idx = randomInt(0, constant.length - 1);
-			const value = constant[idx];
-
-			return new ConstantNode(value);
-		}
-
 		const value = randomInt(min, max);
 
 		return new ConstantNode(value);

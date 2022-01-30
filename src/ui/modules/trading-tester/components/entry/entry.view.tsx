@@ -7,19 +7,15 @@ import { TradingTester } from '../tester';
 (() => {
 	const alfa = evolution({
 		samples: [
-			// new Sample([26, 35], 829),
-			// new Sample([8, 24], 141),
-			// new Sample([20, 1], 467),
-			// new Sample([33, 11], 1215),
-			// new Sample([37, 16], 1517),
-			new Sample([1, 3], 16),
-			new Sample([2, 5], 26),
-			new Sample([7, 1], -8),
-			new Sample([5, 3], 8),
+			new Sample([26, 35], 829),
+			new Sample([8, 24], 141),
+			new Sample([20, 1], 467),
+			new Sample([33, 11], 1215),
+			new Sample([37, 16], 1517),
 		],
 		poolSize: 1000,
-		maxGenerations: 100000,
-		searchSpace: [-10, 10],
+		maxGenerations: 1000000,
+		searchSpace: [0, 5],
 		mutationProb: 0.5,
 		crossProb: 0.9,
 		maxDepth: 5,
@@ -28,7 +24,6 @@ import { TradingTester } from '../tester';
 
 	console.log('alfa program', alfa);
 	console.log('alfa print', alfa.print());
-	console.log('alfa predict', alfa.predict([1, 2, 3, 6]));
 })();
 
 export type TradingTesterEntryProps = {};

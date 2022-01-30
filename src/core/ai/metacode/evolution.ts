@@ -64,6 +64,7 @@ function evolution(options: EvolutionOptions): OperatorNode {
 			}
 
 			program.setError(error);
+			program.incrementLifetime();
 		}
 
 		alfa = alfa.clone();
@@ -72,7 +73,7 @@ function evolution(options: EvolutionOptions): OperatorNode {
 		if (minError === 0) return true;
 
 		population = fill({
-			population: mutate(cross(select(population, avgError, poolSize), crossProb), mutationProb),
+			population: [alfa, ...mutate(cross(select(population, avgError, poolSize), crossProb), mutationProb)],
 			poolSize,
 		});
 
@@ -98,12 +99,16 @@ function evolution(options: EvolutionOptions): OperatorNode {
 
 function select(population: Array<OperatorNode>, avgError: number, poolSize: number): Array<OperatorNode> {
 	let selected: Array<OperatorNode> = [];
+	const maxLifetime = 1000;
 
 	for (const x of population) {
-		if (x.getError() < avgError) {
+		if (x.getError() === Infinity) continue;
+		if (x.getError() < avgError || x.getLifetime() < maxLifetime) {
 			selected.push(x);
 		}
 	}
+
+	selected.sort((a, b) => (a.getError() > b.getError() ? 1 : -1));
 
 	selected = selected.slice(0, poolSize);
 
