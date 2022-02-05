@@ -52,7 +52,7 @@ function sd(values: Array<number>): number {
 		stddev += pow(x - average, 2);
 	}
 
-	stddev = sqrt(stddev / (length - 1));
+	stddev = sqrt(stddev / (length - 1)) || 0.0000000001;
 
 	return stddev;
 }

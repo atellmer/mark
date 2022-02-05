@@ -1,4 +1,4 @@
-import { mean, pow, sqrt, exp } from '@utils/math';
+import { exp } from '@utils/math';
 
 class Sample {
 	private pattern: Array<number> = [];
@@ -57,24 +57,20 @@ class Sample {
 
 function normalizePattern(pattern: Array<number>) {
 	const normalPattern: Array<number> = [];
-	const length = pattern.length;
-	const average = mean(pattern);
-	let stddev = 0.0;
 
-	for (const feature of pattern) {
-		stddev += pow(feature - average, 2);
-	}
-
-	stddev = sqrt(stddev / (length - 1));
-
-	for (let i = 0; i < length; i++) {
-		const x = (pattern[i] - average) / stddev;
-		const y = (exp(x) - exp(-1 * x)) / (exp(x) + exp(-1 * x));
+	for (let i = 0; i < pattern.length; i++) {
+		const x = pattern[i];
+		const y = 1 / (1 + exp(-1 * x));
 
 		normalPattern.push(y);
 	}
 
 	return normalPattern;
 }
+
+export type InlineSample = {
+	pattern: Array<number>;
+	label: number;
+};
 
 export { Sample, normalizePattern };

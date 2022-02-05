@@ -2,6 +2,7 @@ import { log, exp, random } from '@utils/math';
 import { Sample } from '@core/ai/sample';
 import { DecisionStump, InlineDecisionStump } from '@core/ai/adaboost/stump';
 import { Label } from '@core/ai/adaboost/models';
+import { Logger } from '@core/ai/adaboost/logger';
 
 class Estimator {
 	private alfa: number;
@@ -43,7 +44,12 @@ class Estimator {
 		return vote > 0 ? Label.POSITIVE : Label.NEGATIVE;
 	}
 
-	public static train(samples: Array<Sample>, estimatorsTotal: number): Array<Estimator> {
+	public static train(
+		samples: Array<Sample>,
+		estimatorsTotal: number,
+		label: number,
+		logger: Logger,
+	): Array<Estimator> {
 		const estimators: Array<Estimator> = [];
 		const weights: Array<Weight> = samples.map((_, idx) => new Weight(1 / samples.length, idx));
 		const size = samples.length;
@@ -72,17 +78,19 @@ class Estimator {
 			}
 
 			if (epsilon <= 0) {
-				epsilon = 0.00000000000000001;
+				epsilon = 0.00001;
 			}
 
 			if (epsilon >= 1) {
-				epsilon = 0.99999999999999999;
+				epsilon = 0.99999;
 			}
 
 			alfa = 0.5 * log((1 - epsilon) / epsilon);
 
 			estimator.setAlfa(alfa);
 			estimator.setStump(stump);
+
+			logger.log('label:', label, 'estimator #', estimatorIdx + 1, 'epsilon:', epsilon, 'alfa:', alfa);
 
 			estimators.push(estimator);
 
@@ -91,8 +99,9 @@ class Estimator {
 				const label = sample.getLabel();
 				const prediction = predictions[i];
 				const weight = weights[i].getValue();
+				const q = weight * exp(-1 * alfa * label * prediction);
 
-				totalWeights += weight * exp(-1 * alfa * label * prediction);
+				totalWeights += q;
 			}
 
 			for (let i = 0; i < size; i++) {

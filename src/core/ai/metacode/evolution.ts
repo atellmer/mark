@@ -165,3 +165,24 @@ function fill(options: FillOptions): Array<OperatorNode> {
 }
 
 export { evolution };
+
+// const alfa = evolution({
+// 	samples: [
+// 		new Sample([26, 35], 829),
+// 		new Sample([8, 24], 141),
+// 		new Sample([20, 1], 467),
+// 		new Sample([33, 11], 1215),
+// 		new Sample([37, 16], 1517),
+// 	],
+// 	poolSize: 1000,
+// 	maxGenerations: 1000,
+// 	searchSpace: [-10, 10],
+// 	mutationProb: 0.5,
+// 	crossProb: 0.9,
+// 	maxDepth: 5,
+// 	enableLogging: true,
+// });
+
+// console.log('alfa program', alfa);
+// console.log('alfa print', alfa.print());
+// console.log('alfa predict', alfa.predict([7, 3]));

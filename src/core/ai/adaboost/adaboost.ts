@@ -4,28 +4,38 @@ import { Sample, normalizePattern } from '@core/ai/sample';
 import { Label } from '@core/ai/adaboost/models';
 import { Estimator, InlineEstimator } from '@core/ai/adaboost/estimator';
 import { DecisionStump } from '@core/ai/adaboost/stump';
+import { Logger } from '@core/ai/adaboost/logger';
 
 type AdaBoostOptions = {
 	samples?: Array<Sample>;
 	estimatorsTotal?: number;
 	inlineEngine?: InlinePredictionEngine;
+	enableLogs?: boolean;
 };
 
 function adaboost(options: AdaBoostOptions) {
-	const { samples, estimatorsTotal, inlineEngine } = options;
+	const { samples, estimatorsTotal, inlineEngine, enableLogs } = options;
 	if (inlineEngine) return recovery(inlineEngine);
 	const normalSamples = Sample.normalize(samples);
+	const logger = new Logger(enableLogs);
 
-	return train(normalSamples, estimatorsTotal);
+	return train({ samples: normalSamples, estimatorsTotal, logger });
 }
 
-function train(sourceSamples: Array<Sample>, estimatorsTotal: number): PredictionEngine {
+type TrainOptions = {
+	samples: Array<Sample>;
+	estimatorsTotal: number;
+	logger: Logger;
+};
+
+function train(options: TrainOptions): PredictionEngine {
+	const { samples: sourceSamples, estimatorsTotal, logger } = options;
 	const sourceLabels: Array<number> = getSourceLabels(sourceSamples);
 	const estimatorsMap: Record<number, Array<Estimator>> = {};
 
 	for (const sourceLabel of sourceLabels) {
 		const samples = prepareSamples(sourceSamples, sourceLabel);
-		const estimators = Estimator.train(samples, estimatorsTotal);
+		const estimators = Estimator.train(samples, estimatorsTotal, sourceLabel, logger);
 
 		estimatorsMap[sourceLabel] = estimators;
 	}
@@ -97,13 +107,7 @@ class PredictionEngine {
 		this.estimatorsMap = estimatorsMap;
 	}
 
-	public predict(patterns: Array<Array<number>>): Array<number> {
-		const predictions: Array<number> = patterns.map(x => this.predictOne(x));
-
-		return predictions;
-	}
-
-	public predictOne(pattern: Array<number>) {
+	private predictOne(pattern: Array<number>) {
 		const normalPattern = normalizePattern(pattern);
 		const values: Array<number> = [];
 
@@ -120,6 +124,28 @@ class PredictionEngine {
 		return predict;
 	}
 
+	private bench = (samples: Array<Sample>) => {
+		let error = 0;
+
+		for (const sample of samples) {
+			const pattern = sample.getPattern();
+			const label = sample.getLabel();
+			const [prediction] = this.predict([pattern]);
+
+			if (prediction !== label) {
+				error++;
+			}
+		}
+
+		return error;
+	};
+
+	public predict(patterns: Array<Array<number>>): Array<number> {
+		const predictions: Array<number> = patterns.map(x => this.predictOne(x));
+
+		return predictions;
+	}
+
 	public verasity(train: Array<Sample>, test: Array<Sample>) {
 		let trainError = 0;
 		let testError = 0;
@@ -129,6 +155,7 @@ class PredictionEngine {
 		trainError = fix((trainValue / train.length) * 100);
 		testError = fix((testValue / test.length) * 100);
 
+		console.log(`adaboost algorithm:`);
 		console.log(`number of train samples: ${train.length}`);
 		console.log(`number of test samples: ${test.length}`);
 		console.log(`in sample error: ${trainError.toFixed(2)}%`);
@@ -149,22 +176,6 @@ class PredictionEngine {
 
 		saveJsonToFile(json, filename);
 	}
-
-	private bench = (samples: Array<Sample>) => {
-		let error = 0;
-
-		for (const sample of samples) {
-			const pattern = sample.getPattern();
-			const label = sample.getLabel();
-			const [prediction] = this.predict([pattern]);
-
-			if (prediction !== label) {
-				error++;
-			}
-		}
-
-		return error;
-	};
 }
 
 type InlinePredictionEngine = {

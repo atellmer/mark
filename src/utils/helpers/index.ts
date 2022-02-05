@@ -11,8 +11,6 @@ function groupBy<T>(elements: Array<T>, selector: (x: T) => string | number): Re
 	for (const x of elements) {
 		const key = selector(x);
 
-		if (!key) continue;
-
 		if (!map[key]) {
 			map[key] = [];
 		}
@@ -39,4 +37,16 @@ function fillEnd(str: string, size: number, value: string) {
 	return str;
 }
 
-export { detectIsFunction, detectIsUndefined, groupBy, createObjectMap, createListFromMap, fillEnd };
+function extractKeysToArray<T = string>(object: object, transformKey: (key) => T = x => x) {
+	return object ? Object.keys(object).map(key => transformKey(key)) : [];
+}
+
+export {
+	detectIsFunction,
+	detectIsUndefined,
+	groupBy,
+	createObjectMap,
+	createListFromMap,
+	fillEnd,
+	extractKeysToArray,
+};

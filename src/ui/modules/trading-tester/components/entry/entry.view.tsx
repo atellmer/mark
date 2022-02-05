@@ -1,29 +1,32 @@
 import React from 'react';
 
 import { Sample } from '@core/ai/sample';
-import { evolution } from '@core/ai/metacode';
+import trainCarnumbersDataset from '@core/ai/datasets/carnumbers/train.csv';
+import testCarnumbersDataset from '@core/ai/datasets/carnumbers/test.csv';
+import trainIrisesDataset from '@core/ai/datasets/irises/train.csv';
+import testIrisesDataset from '@core/ai/datasets/irises/test.csv';
+//import pnnIrisesInlineEngine from '@core/ai/pnn/trained/irises-model.json';
+//import pnnCarnumbersInlineEngine from '@core/ai/pnn/trained/carnumbers-model.json';
+//import adaboostIrisesInlineEngine from '@core/ai/adaboost/trained/irises-model.json';
+import { pnn } from '@core/ai/pnn';
+import { adaboost } from '@core/ai/adaboost';
 import { TradingTester } from '../tester';
 
 (() => {
-	const alfa = evolution({
-		samples: [
-			new Sample([26, 35], 829),
-			new Sample([8, 24], 141),
-			new Sample([20, 1], 467),
-			new Sample([33, 11], 1215),
-			new Sample([37, 16], 1517),
-		],
-		poolSize: 1000,
-		maxGenerations: 1000000,
-		searchSpace: [0, 5],
-		mutationProb: 0.5,
-		crossProb: 0.9,
-		maxDepth: 5,
-		enableLogging: true,
-	});
+	const trainSamples = Sample.fromDataset(trainIrisesDataset);
+	const testSamples = Sample.fromDataset(testIrisesDataset);
 
-	console.log('alfa program', alfa);
-	console.log('alfa print', alfa.print());
+	const pnnEngine = pnn({ samples: trainSamples });
+
+	pnnEngine.verasity(trainSamples, testSamples);
+
+	// const adaboostEngine = adaboost({
+	// 	samples: trainSamples,
+	// 	estimatorsTotal: 100,
+	// 	enableLogs: true,
+	// });
+
+	// adaboostEngine.verasity(trainSamples, testSamples);
 })();
 
 export type TradingTesterEntryProps = {};
