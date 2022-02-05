@@ -1,4 +1,4 @@
-import { sd, fix } from '@utils/math';
+import { fix } from '@utils/math';
 import { groupBy, extractKeysToArray } from '@utils/helpers';
 import { saveJsonToFile } from '@utils/file';
 import { Sample, InlineSample, normalizePattern } from '@core/ai/sample';
@@ -36,14 +36,13 @@ class PredictionEngine {
 
 			for (const sample of samples) {
 				const basePattern = sample.getPattern();
-				const stdev = sd(basePattern);
 				let dss = 0.0;
 
 				for (let i = 0; i < basePattern.length; i++) {
 					dss += Math.pow(basePattern[i] - inputPattern[i], 2.0);
 				}
 
-				gs += Math.exp((-1.0 * dss) / (2.0 * Math.pow(stdev, 2.0)));
+				gs += Math.exp((-1.0 * dss) / 2.0);
 			}
 
 			values.push(gs);
