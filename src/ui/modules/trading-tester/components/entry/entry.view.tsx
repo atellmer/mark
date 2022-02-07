@@ -7,6 +7,8 @@ import trainIrisesDataset from '@core/ai/datasets/irises/train.csv';
 import testIrisesDataset from '@core/ai/datasets/irises/test.csv';
 import trainCancerDataset from '@core/ai/datasets/cancer/train.csv';
 import testCancerDataset from '@core/ai/datasets/cancer/test.csv';
+import trainTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/train.csv';
+import testTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/test.csv';
 //import pnnIrisesInlineEngine from '@core/ai/pnn/trained/irises-model.json';
 //import pnnCarnumbersInlineEngine from '@core/ai/pnn/trained/carnumbers-model.json';
 //import adaboostIrisesInlineEngine from '@core/ai/adaboost/trained/irises-model.json';
@@ -15,20 +17,23 @@ import { adaboost } from '@core/ai/adaboost';
 import { TradingTester } from '../tester';
 
 (() => {
-	const trainSamples = Sample.fromDataset(trainCancerDataset);
-	const testSamples = Sample.fromDataset(testCancerDataset);
+	const trainSamples = Sample.fromDataset(trainIrisesDataset);
+	const testSamples = Sample.fromDataset(testIrisesDataset);
 
 	// const pnnEngine = pnn({ samples: trainSamples });
 
 	// pnnEngine.verasity(trainSamples, testSamples);
 
-	const adaboostEngine = adaboost({
-		samples: trainSamples,
-		estimatorsTotal: 30,
-		enableLogs: true,
-	});
-
-	adaboostEngine.verasity(trainSamples, testSamples);
+	console.log('start...');
+	setTimeout(() => {
+		const adaboostEngine = adaboost({
+			samples: trainSamples,
+			estimatorsTotal: 100,
+			samplingSize: 10,
+			enableLogs: true,
+		});
+		adaboostEngine.verasity(trainSamples, testSamples);
+	}, 3000);
 })();
 
 export type TradingTesterEntryProps = {};

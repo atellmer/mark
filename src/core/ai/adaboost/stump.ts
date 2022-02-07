@@ -54,10 +54,11 @@ class DecisionStump {
 	public static train(samples: Array<Sample>): DecisionStump {
 		const stump = new DecisionStump();
 		const [sample] = samples;
+		const sampleLength = sample.getLength();
 		let minimalError = Number.POSITIVE_INFINITY;
 		let currentError = 0.0;
 
-		for (let featureIdx = 0; featureIdx < sample.getLength(); featureIdx++) {
+		for (let featureIdx = 0; featureIdx < sampleLength; featureIdx++) {
 			const features = samples
 				.map(x => new Feature(x.getFeatureValue(featureIdx), x.getLabel()))
 				.sort((a, b) => a.getValue() - b.getValue());

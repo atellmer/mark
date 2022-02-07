@@ -9,33 +9,32 @@ import { Logger } from '@core/ai/adaboost/logger';
 type AdaBoostOptions = {
 	samples?: Array<Sample>;
 	estimatorsTotal?: number;
+	samplingSize?: number;
 	inlineEngine?: InlinePredictionEngine;
 	enableLogs?: boolean;
 };
 
 function adaboost(options: AdaBoostOptions) {
-	const { samples, estimatorsTotal, inlineEngine, enableLogs } = options;
+	const { samples, estimatorsTotal, inlineEngine, samplingSize, enableLogs } = options;
 	if (inlineEngine) return recovery(inlineEngine);
 	const normalSamples = Sample.normalize(samples);
 	const logger = new Logger(enableLogs);
 
-	return train({ samples: normalSamples, estimatorsTotal, logger });
+	return train({ samples: normalSamples, estimatorsTotal, samplingSize, logger });
 }
 
 type TrainOptions = {
-	samples: Array<Sample>;
-	estimatorsTotal: number;
 	logger: Logger;
-};
+} & Required<Pick<AdaBoostOptions, 'samples' | 'estimatorsTotal' | 'samplingSize'>>;
 
 function train(options: TrainOptions): PredictionEngine {
-	const { samples: sourceSamples, estimatorsTotal, logger } = options;
+	const { samples: sourceSamples, estimatorsTotal, samplingSize, logger } = options;
 	const sourceLabels: Array<number> = getSourceLabels(sourceSamples);
 	const estimatorsMap: Record<number, Array<Estimator>> = {};
 
 	for (const sourceLabel of sourceLabels) {
 		const samples = prepareSamples(sourceSamples, sourceLabel);
-		const estimators = Estimator.train(samples, estimatorsTotal, sourceLabel, logger);
+		const estimators = Estimator.train({ samples, estimatorsTotal, samplingSize, label: sourceLabel, logger });
 
 		estimatorsMap[sourceLabel] = estimators;
 	}
@@ -56,7 +55,7 @@ function getSourceLabels(samples: Array<Sample>): Array<number> {
 		}
 	}
 
-	return items;
+	return items.sort((a, b) => a - b);
 }
 
 function prepareSamples(samples: Array<Sample>, sourceLabel: number): Array<Sample> {
