@@ -13,14 +13,12 @@ export type DecisionTreeRecoveryOptions = {
 	inlineEngine?: InlinePredictionEngine;
 };
 
-export type FeatureValue = string | number;
-
 export type NodeType = 'parent' | 'leaf';
 
 export type ParentDecisionNode<T> = {
 	type: 'parent';
 	featureIdx: number;
-	threshold: FeatureValue;
+	threshold: number;
 	leftNode: T;
 	rightNode: T;
 };
@@ -32,13 +30,13 @@ export type LeafDecisionNode = {
 
 export type Criteria = {
 	featureIdx: number;
-	threshold: FeatureValue;
+	threshold: number;
 };
 
 export type InlineDecisionNode = {
 	type: string;
 	featureIdx: number;
-	threshold: FeatureValue;
+	threshold: number;
 	leftNode: Partial<InlineDecisionNode>;
 	rightNode: Partial<InlineDecisionNode>;
 	distribution: Record<string, number>;

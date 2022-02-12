@@ -9,12 +9,13 @@ import trainCancerDataset from '@core/ai/datasets/cancer/train.csv';
 import testCancerDataset from '@core/ai/datasets/cancer/test.csv';
 import trainTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/train.csv';
 import testTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/test.csv';
+import xorDataset from '@core/ai/datasets/xor/train.csv';
 import { decisiontree } from '@core/ai/trees';
 import { TradingTester } from '../tester';
 
 (() => {
-	const trainSamples = Sample.fromDataset(trainIrisesDataset);
-	const testSamples = Sample.fromDataset(testIrisesDataset);
+	const trainSamples = Sample.fromDataset(trainCarnumbersDataset);
+	const testSamples = Sample.fromDataset(testCarnumbersDataset);
 
 	const engine = decisiontree({ variant: 'fit', samples: trainSamples });
 

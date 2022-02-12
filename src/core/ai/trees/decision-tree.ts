@@ -1,5 +1,5 @@
-import { fix } from '@utils/math';
-import { extractKeysToArray, detectIsNumber } from '@utils/helpers';
+import { fix, mean } from '@utils/math';
+import { extractKeysToArray } from '@utils/helpers';
 import { saveJsonToFile } from '@utils/file';
 import { Sample } from '@core/ai/sample';
 import {
@@ -10,7 +10,6 @@ import {
 	NodeType,
 	ParentDecisionNode,
 	LeafDecisionNode,
-	FeatureValue,
 	Criteria,
 } from './models';
 
@@ -47,7 +46,7 @@ class PredictionEngine {
 		saveJsonToFile(json, filename);
 	}
 
-	public predict(pattern: Array<FeatureValue>): number {
+	public predict(pattern: Array<number>): number {
 		return this.tree.predict(pattern);
 	}
 
@@ -123,22 +122,20 @@ function fit(options: FitOptions): DecisionNode {
 	const columnCount = samples[0].getLength();
 
 	for (let featureIdx = 0; featureIdx < columnCount; featureIdx++) {
-		for (const sample of samples) {
-			const pattern = sample.getPattern();
-			const threshold = pattern[featureIdx];
-			const [setLeft, setRight] = divideSet({ samples, featureIdx, threshold });
-			const p = setLeft.length / samples.length;
-			const gain = score - p * entropy(setLeft) - (1 - p) * entropy(setRight);
+		const features = samples.map(x => x.getFeatureValue(featureIdx));
+		const threshold = mean(features);
+		const [setLeft, setRight] = divideSet({ samples, featureIdx, threshold });
+		const p = setLeft.length / samples.length;
+		const gain = score - p * entropy(setLeft) - (1 - p) * entropy(setRight);
 
-			if (gain > bestGain && setLeft.length > 0 && setRight.length > 0) {
-				bestGain = gain;
-				criteria = { featureIdx, threshold };
-				sets = [setLeft, setRight];
-			}
+		if ((gain > bestGain && setLeft.length > 0 && setRight.length > 0) || !criteria) {
+			bestGain = gain;
+			criteria = { featureIdx, threshold };
+			sets = [setLeft, setRight];
 		}
 	}
 
-	if (bestGain > 0 && depth < maxDepth) {
+	if (depth === 0 || (bestGain > 0 && depth < maxDepth)) {
 		const [setLeft, setRight] = sets;
 
 		return new DecisionNode({
@@ -160,7 +157,7 @@ type DecisionNodeConstructor = {
 class DecisionNode {
 	private type: NodeType;
 	private featureIdx: number;
-	private threshold: FeatureValue;
+	private threshold: number;
 	private leftNode: DecisionNode;
 	private rightNode: DecisionNode;
 	private distribution: Record<string, number>;
@@ -180,10 +177,10 @@ class DecisionNode {
 		}
 	}
 
-	public predict(pattern: Array<FeatureValue>): number {
+	public predict(pattern: Array<number>): number {
 		if (this.type === 'parent') {
 			const value = pattern[this.featureIdx];
-			const isLeft = detectIsNumber(this.threshold) ? value >= this.threshold : value === this.threshold;
+			const isLeft = value >= this.threshold;
 
 			return isLeft ? this.leftNode.predict(pattern) : this.rightNode.predict(pattern);
 		}
@@ -200,27 +197,24 @@ class DecisionNode {
 type DivideSetOptions = {
 	samples: Array<Sample>;
 	featureIdx: number;
-	threshold: FeatureValue;
+	threshold: number;
 };
 
 function divideSet(options: DivideSetOptions): [Array<Sample>, Array<Sample>] {
 	const { samples, featureIdx, threshold } = options;
-	const [sample] = samples;
-	const splitFn = (x: Sample) => {
-		const pattern = x.getPattern() as Array<FeatureValue>;
-		const value = pattern[featureIdx];
-
-		return detectIsNumber(threshold) ? value >= threshold : value === threshold;
-	};
 	const setLeft: Array<Sample> = [];
 	const setRight: Array<Sample> = [];
+	const [sample] = samples;
 
 	if (featureIdx > sample.getLength() - 1) {
 		throw new Error('idx is out of pattern length!');
 	}
 
 	for (const sample of samples) {
-		if (splitFn(sample)) {
+		const pattern = sample.getPattern();
+		const value = pattern[featureIdx];
+
+		if (value >= threshold) {
 			setLeft.push(sample);
 		} else {
 			setRight.push(sample);
