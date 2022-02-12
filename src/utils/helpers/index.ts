@@ -1,8 +1,13 @@
 function detectIsFunction(x: unknown): x is Function {
 	return typeof x === 'function';
 }
+
 function detectIsUndefined(x: unknown): x is undefined {
 	return typeof x === 'undefined';
+}
+
+function detectIsNumber(x: unknown): x is Number {
+	return typeof x === 'number';
 }
 
 function groupBy<T>(elements: Array<T>, selector: (x: T) => string | number): Record<string, Array<T>> {
@@ -44,6 +49,7 @@ function extractKeysToArray<T = string>(object: object, transformKey: (key) => T
 export {
 	detectIsFunction,
 	detectIsUndefined,
+	detectIsNumber,
 	groupBy,
 	createObjectMap,
 	createListFromMap,
