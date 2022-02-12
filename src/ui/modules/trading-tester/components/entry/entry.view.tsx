@@ -9,13 +9,14 @@ import trainCancerDataset from '@core/ai/datasets/cancer/train.csv';
 import testCancerDataset from '@core/ai/datasets/cancer/test.csv';
 import trainTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/train.csv';
 import testTicTacToeDataset from '@core/ai/datasets/tic-tac-toe/test.csv';
+import { devideSet } from '@core/ai/trees';
 import { TradingTester } from '../tester';
 
 (() => {
 	const trainSamples = Sample.fromDataset(trainIrisesDataset);
 	const testSamples = Sample.fromDataset(testIrisesDataset);
 
-
+	console.log('sets', devideSet({ samples: trainSamples, columnIdx: 0, threshold: 5 }));
 })();
 
 export type TradingTesterEntryProps = {};
